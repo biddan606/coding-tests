@@ -43,14 +43,7 @@ class Solution {
             }
         }
 
-        int result = Integer.MAX_VALUE;
-        for (int row = maxRow - alp; row < costs.length; row++) {
-            for (int col = maxCol - cop; col < costs[0].length; col++) {
-                result = Math.min(costs[row][col], result);
-            }
-        }
-
-        return result;
+        return costs[costs.length - 1][costs[0].length - 1];
     }
 
     public static void main(String[] args) {
