@@ -35,12 +35,19 @@ public class Main {
     }
 
     private static int getYear(int maxX, int maxY, int targetX, int targetY){
-        for (int year = targetX; year <= lcm(maxX, maxY); year += maxX) {
-            int currentX = ((year - 1) % maxX) + 1;
-            int currentY = ((year - 1) % maxY) + 1;
+        int maxYear = lcm(maxX, maxY);
+        int x = targetX;
+        int y = targetY;
 
-            if (currentX == targetX && currentY == targetY) {
-                return year;
+        while (x <= maxYear && y <= maxYear) {
+            if (x == y) {
+                return x;
+            }
+
+            if (x > y) {
+                y += maxY;
+            } else {
+                x += maxX;
             }
         }
 
