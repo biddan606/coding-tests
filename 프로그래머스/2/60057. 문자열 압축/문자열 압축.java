@@ -1,41 +1,62 @@
+import java.util.ArrayList;
+import java.util.List;
+
 class Solution {
 
     public int solution(String source) {
-        int answer = Integer.MAX_VALUE;
+        int minCompressedLength = source.length();
 
-        for (int countToParse = 1; countToParse <= source.length(); countToParse++) {
-            int currentAnswer = parse(source, countToParse);
+        for (int compressionLength = 1; compressionLength <= source.length(); compressionLength++) {
+            List<String> tokens = split(source, compressionLength);
+            int compressedLength = getCompressedLength(tokens);
 
-            answer = Math.min(currentAnswer, answer);
+            minCompressedLength = Math.min(compressedLength, minCompressedLength);
         }
 
-        return answer;
+        return minCompressedLength;
     }
 
-    private int parse(String source, int countToCompress) {
-        StringBuilder compressedString = new StringBuilder();
+    private int getCompressedLength(List<String> tokens) {
 
-        int index = 0;
-        while (index + countToCompress <= source.length()) {
-            int count = 1;
-            int indexToCompare = index + countToCompress;
-            while (indexToCompare + countToCompress <= source.length() &&
-                    source.substring(index, index + countToCompress)
-                    .equals(source.substring(indexToCompare, indexToCompare + countToCompress))) {
+        StringBuilder builder = new StringBuilder();
+        String lastToken = "";
+        int count = 1;
+
+        for (String token : tokens) {
+            if (lastToken.equals(token)) {
                 count++;
-                index += countToCompress;
-                indexToCompare += countToCompress;
+                continue;
             }
 
             if (count != 1) {
-                compressedString.append(count);
+                builder.append(count);
             }
+            builder.append(lastToken);
 
-            compressedString.append(source, index, index + countToCompress);
-            index += countToCompress;
+            lastToken = token;
+            count = 1;
         }
 
-        return compressedString.length() + source.length() - index;
+        if (count != 1) {
+            builder.append(count);
+        }
+        builder.append(lastToken);
+
+        return builder.length();
+    }
+
+    private List<String> split(String str, int compressionLength) {
+        List<String> tokens = new ArrayList<>();
+
+        for (int startIndex = 0; startIndex < str.length(); startIndex += compressionLength) {
+            int endIndex = Math.min(str.length(), startIndex + compressionLength);
+
+            String token = str.substring(startIndex, endIndex);
+
+            tokens.add(token);
+        }
+
+        return tokens;
     }
 
     public static void main(String[] args) {
