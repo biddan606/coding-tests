@@ -18,18 +18,6 @@ class Solution {
         return new int[]{loopCount, removedZeroCount};
     }
 
-    private int countOne(String str) {
-        int count = 0;
-
-        for (char c : str.toCharArray()) {
-            if (c == '1') {
-                count++;
-            }
-        }
-
-        return count;
-    }
-
     private String removeZero(String str) {
         StringBuilder builder = new StringBuilder();
 
