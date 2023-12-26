@@ -1,12 +1,11 @@
-import java.util.*;
-
 class Solution {
+
     public int solution(int n) {
-        String base3 = Long.toString(n, 3);
+        String base3 = Integer.toString(n, 3);
 
         String reversedBase3 = new StringBuilder(base3)
                 .reverse().toString();
 
-        return (int) Long.parseLong(reversedBase3, 3);
+        return Integer.parseInt(reversedBase3, 3);
     }
 }
