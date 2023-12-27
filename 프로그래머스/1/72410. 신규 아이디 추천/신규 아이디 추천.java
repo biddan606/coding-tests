@@ -37,11 +37,9 @@ class Solution {
 
         // id 길이가 2자 이하라면, 이어 붙여서 3자로 만듦
         if (id.length() <= 2) {
-            StringBuilder builder = new StringBuilder(id);
-            while (builder.length() < 3) {
-                builder.append(id.charAt(id.length() - 1));
+            while (id.length() < 3) {
+                id += id.charAt(id.length() - 1);
             }
-            id = builder.toString();
         }
 
         return id;
