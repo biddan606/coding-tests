@@ -26,13 +26,13 @@ class Solution {
         // id 길이가 16자 이상이면, 첫 15개의 문자를 제외한 문자 모두 제거
         if (id.length() >= 16) {
             id = id.substring(0, 15);
-        }
-        // id의 양 끝이 마침표로 끝난다면 제거
-        if (id.startsWith(".")) {
-            id = id.substring(1);
-        }
-        if (id.endsWith(".")) {
-            id = id.substring(0, id.length() - 1);
+            // id의 양 끝이 마침표로 끝난다면 제거
+            if (id.startsWith(".")) {
+                id = id.substring(1);
+            }
+            if (id.endsWith(".")) {
+                id = id.substring(0, id.length() - 1);
+            }
         }
 
         // id 길이가 2자 이하라면, 이어 붙여서 3자로 만듦
