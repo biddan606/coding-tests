@@ -1,53 +1,51 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 class Solution {
-    private static char[] VOWELS = {'A', 'E', 'I', 'O', 'U'};
-    
-    private int resultCount = -1;
-    
+
+    private static char[] VOWELS = "AEIOU".toCharArray();
+
     public int solution(String word) {
-        int answer = findDictionaryOrder(word, "", 0);
-        
-        return resultCount;
+        List<String> words = new ArrayList<>();
+        generateWords("", words);
+
+        return words.indexOf(word) + 1;
     }
-    
-    private int findDictionaryOrder(String destinationWord, String startWord, int startCount) {    
-        if (startWord.length() == 5) {
-            return startCount;
+
+    private void generateWords(String word, List<String> words) {
+        if (word.length() == 5) {
+            return;
         }
-        
-        int count = startCount;
+
         for (char vowel : VOWELS) {
-            String nextWord = startWord + vowel;
-            int nextCount =  count + 1;
-            
-            if (Objects.equals(destinationWord, nextWord)) {
-                resultCount = nextCount;
-            }
-            
-            count = findDictionaryOrder(destinationWord, nextWord, nextCount);
-            if (resultCount != -1) {
-                return -1;
-            }
+            String nextWord = word + vowel;
+
+            words.add(nextWord);
+            generateWords(nextWord, words);
         }
-        
-        return count;
+    }
+
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+
+        System.out.println(solution.solution("I"));
     }
 }
 
+
 /*
-"A", 
+"A",
 
-"AA", 
+"AA",
 
-"AAA", 
+"AAA",
 
-"AAAA", 
+"AAAA",
 
-"AAAAA", 
-"AAAAE", 
-"AAAAI", 
-"AAAAO", 
+"AAAAA",
+"AAAAE",
+"AAAAI",
+"AAAAO",
 "AAAAU",
 
 "AAAE",
