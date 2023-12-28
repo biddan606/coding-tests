@@ -3,29 +3,26 @@ import java.util.List;
 
 class Solution {
     public int[][] solution(int n) {
-        List<int[]> result = hanoi(n, 1, 3);
+        List<int[]> process  = new ArrayList<>();
+        hanoi(n, 1, 3, process);
 
-        return result.toArray(int[][]::new);
+        return process.toArray(int[][]::new);
     }
 
-    private List<int[]> hanoi(int size, int from, int to) {
-        ArrayList<int[]> result = new ArrayList<>();
-
+    private void hanoi(int size, int from, int to, List<int[]> process) {
         if (size == 1) {
-            result.add(new int[]{from, to});
-
-            return result;
+            process.add(new int[]{from, to});
+            return;
         }
 
         int empty = 6 - from - to;
 
-        result.addAll(hanoi(size - 1, from, empty));
-        result.addAll(hanoi(1, from, to));
-        result.addAll(hanoi(size - 1, empty, to));
-
-        return result;
+        hanoi(size - 1, from, empty, process);
+        hanoi(1, from, to, process);
+        hanoi(size - 1, empty, to, process);
     }
 }
+
 
 /*
 (3, 1, 3) // 1, 2, 3
