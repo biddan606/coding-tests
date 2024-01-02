@@ -5,23 +5,20 @@ class Solution {
 
     public int solution(String numbers) {
         // 각 자릿수를 얻는다.
-        String[] digits = numbers.split("");
+        int[] digits = numbers.chars()
+                .map(c -> c - '0')
+                .toArray();
 
         // DFS를 돌며 소수를 얻는다.
         Set<Integer> primeNumbers = new HashSet<>();
-        setPrimeNumbers(digits, new boolean[digits.length], "", primeNumbers);
+        setPrimeNumbers(digits, new boolean[digits.length], 0, primeNumbers);
 
         return primeNumbers.size();
     }
 
-    private void setPrimeNumbers(String[] digits, boolean[] usedDigits, String numberString,
-            Set<Integer> primeNumbers) {
-        if (!numberString.isBlank()) {
-            int number = Integer.parseInt(numberString);
-
-            if (!primeNumbers.contains(number) && isPrimeNumber(number)) {
-                primeNumbers.add(number);
-            }
+    private void setPrimeNumbers(int[] digits, boolean[] usedDigits, int number, Set<Integer> primeNumbers) {
+        if (isPrimeNumber(number)) {
+            primeNumbers.add(number);
         }
 
         for (int i = 0; i < digits.length; i++) {
@@ -31,7 +28,7 @@ class Solution {
 
             usedDigits[i] = true;
 
-            setPrimeNumbers(digits, usedDigits, numberString + digits[i], primeNumbers);
+            setPrimeNumbers(digits, usedDigits, number * 10 + digits[i], primeNumbers);
 
             usedDigits[i] = false;
         }
