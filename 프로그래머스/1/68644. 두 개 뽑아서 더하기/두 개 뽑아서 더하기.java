@@ -17,7 +17,7 @@ class Solution {
         }
 
         return resultSet.stream()
-                .mapToInt(n -> n)
+                .mapToInt(Integer::intValue)
                 .toArray();
     }
 }
