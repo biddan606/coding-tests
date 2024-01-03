@@ -1,5 +1,4 @@
 import java.util.Arrays;
-import java.util.Collections;
 
 class Solution {
 
@@ -20,10 +19,7 @@ class Solution {
     }
 
     private int[] getSubArray(int[] array, int beginIndex, int endIndex) {
-        int[] subArray = new int[endIndex - beginIndex + 1];
-        System.arraycopy(array, beginIndex - 1, subArray, 0, subArray.length);
-
-        return subArray;
+        return Arrays.copyOfRange(array, beginIndex - 1, endIndex);
     }
 
     private int getElement(int[] array, int sequence) {
