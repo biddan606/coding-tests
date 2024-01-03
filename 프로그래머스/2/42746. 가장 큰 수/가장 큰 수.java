@@ -4,15 +4,15 @@ import java.util.stream.Collectors;
 class Solution {
 
     public String solution(int[] numbers) {
-        if (Arrays.stream(numbers).allMatch(i -> i == 0)) {
-            return "0";
-        }
+//        if (Arrays.stream(numbers).allMatch(i -> i == 0)) {
+//            return "0";
+//        }
 
         return Arrays.stream(numbers)
-                .boxed()
-                .map(String::valueOf)
+                .mapToObj(String::valueOf)
                 .sorted((s1, s2) -> (s2 + s1).compareTo(s1 + s2))
-                .collect(Collectors.joining());
+                .collect(Collectors.joining())
+                .replaceAll("^0+", "0");
     }
 
     public static void main(String[] args) {
