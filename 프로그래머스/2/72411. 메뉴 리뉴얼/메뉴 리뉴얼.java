@@ -1,126 +1,82 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.stream.*;
 
 class Solution {
-
     public String[] solution(String[] orders, int[] course) {
-        // orders를 정렬된 set으로 변환한다.
-        Set<String>[] orderSet = new Set[orders.length];
-        for (int i = 0; i < orderSet.length; i++) {
-            orderSet[i] = new TreeSet<>(List.of(orders[i].split("")));
+        List<Set<String>> orderList = Arrays.stream(orders)
+            .map(String::chars) 
+            .map(charStream -> charStream
+                 .mapToObj(menu -> String.valueOf((char) menu))
+                 .collect(Collectors.toSet()))
+            .collect(Collectors.toList());
+        
+        Map<Integer, List<Course>> courses = new HashMap<>();
+        for (int length : course) {
+            List<Course> list = new ArrayList<>();
+            
+            list.add(new Course("", 0));
+            
+            courses.put(length, list);
         }
-
-        Set<String> menuCandidates = new HashSet<>();
-
-        // course 크기의 orders로 만든 코스요리를 만든다.
-        for (int size : course) {
-            List<Set<String>> courseMenus = new ArrayList<>();
-            generateCourseMenus(orderSet, size, courseMenus);
-
-            // 만든 코스요리가 몇번 주문 되었는지 계산한다.
-            Map<Integer, List<String>> courseMap = new HashMap<>();
-            for (Set<String> courseMenu : courseMenus) {
-                CourseCount courseCount = getCourseCount(orderSet, courseMenu);
-                courseMap.computeIfAbsent(courseCount.count, k -> new ArrayList<>())
-                        .add(courseCount.name);
-            }
-
-            // 해당 course count에서 가장 많이 주문된 요리를 메뉴 후보에 추가한다. (최소 2 이상이어야 한다)
-            List<String> addingCourses = courseMap.entrySet().stream()
-                    .filter(e -> e.getKey() >= 2)
-                    .max(Entry.comparingByKey())
-                    .map(Entry::getValue)
-                    .orElse(new ArrayList<>());
-
-            menuCandidates.addAll(addingCourses);
-        }
-
-        // 메뉴 후보를 반환한다.
-        return menuCandidates.stream()
-                .sorted()
-                .toArray(String[]::new);
+        getCourses('A', new HashSet<>(), orderList, courses);
+            
+        return courses.values().stream()
+            .filter(list -> list.get(0).occurrences > 0)
+            .flatMap(List::stream)
+            .map(c -> c.name)
+            .sorted()
+            .toArray(String[]::new);
     }
-
-    private void generateCourseMenus(Set<String>[] orderSet, int size, List<Set<String>> courseMenus) {
-        for (Set<String> order : orderSet) {
-            ArrayList<String> list = new ArrayList<>(order);
-            generateCourseMenus(list, 0, new TreeSet<>(), size, courseMenus);
-        }
-    }
-
-    private void generateCourseMenus(List<String> order, int orderIndex,
-            Set<String> courseMenu, int size, List<Set<String>> courseMenus) {
-        if (courseMenu.size() == size) {
-            courseMenus.add(new TreeSet<>(courseMenu));
+    
+    private void getCourses(char nextMenu, Set<String> selectedMenus, 
+                            List<Set<String>> orderList, 
+                            Map<Integer, List<Course>> courses) {
+        int occurrences = (int) orderList.stream()
+            .filter(order -> order.containsAll(selectedMenus))
+            .count();
+        if (occurrences < 2) {
             return;
         }
-
-        for (int i = orderIndex; i < order.size(); i++) {
-            courseMenu.add(order.get(i));
-
-            generateCourseMenus(order, i + 1, courseMenu, size, courseMenus);
-
-            courseMenu.remove(order.get(i));
+        
+        int size = selectedMenus.size();
+        if (courses.containsKey(size)) {
+            List<Course> courseList = courses.get(size);
+            Course course = new Course(selectedMenus.stream()
+                                      .sorted()
+                                      .collect(Collectors.joining("")),
+                                      occurrences);
+            
+            Course original = courseList.get(0);
+            if (original.occurrences < occurrences) {
+                courseList.clear();
+                courseList.add(course);
+            } else if (original.occurrences == occurrences) {
+                courseList.add(course);
+            }
+        }
+        
+        if (size >= 10) {
+            return;
+        }
+        
+        for (char menuChar = nextMenu; menuChar <= 'Z'; menuChar++) {
+            String menu = String.valueOf(menuChar);
+            
+            selectedMenus.add(menu);
+            
+            getCourses((char) (menuChar + 1), selectedMenus, orderList, courses);
+            
+            selectedMenus.remove(menu);
         }
     }
-
-
-    private CourseCount getCourseCount(Set<String>[] orderSet, Set<String> courseMenu) {
-        int count = (int) Arrays.stream(orderSet)
-                .filter(order -> order.containsAll(courseMenu))
-                .count();
-
-        return new CourseCount(count, String.join("", courseMenu));
-    }
-
-    private static class CourseCount {
-
-        int count;
-        String name;
-
-        public CourseCount(int count, String name) {
-            this.count = count;
+    
+    private static class Course {
+        public final String name;
+        public final int occurrences;
+        
+        public Course(String name, int occurrences) {
             this.name = name;
+            this.occurrences = occurrences;
         }
-    }
-
-    public static void main(String[] args) {
-        Solution solution = new Solution();
-        String[] orders = {"ABCFG", "AC", "CDE", "ACDE", "BCFG", "ACDEH"};
-        int[] course = {2, 3, 4};
-
-        String[] result = solution.solution(orders, course);
-        System.out.println(Arrays.toString(result));
     }
 }
-/*
-orders: "ABCFG", "AC", "CDE", "ACDE", "BCFG", "ACDEH"
-course: 2, 3, 4
-
-## course 2
-"AB", "AC", "AF", "AG"
-"BC", "BF", "BG",
-"CF", "CG",
-"FG"
-
-"AC"
-
-"CD", "CE",
-"DE"
-
-...
-
-## course 3
-"ABC", "ABF", "ABG",
-"BCF", "BFG",
-"CFG"
-...
-*/
