@@ -1,7 +1,11 @@
+import java.util.Arrays;
+
 class Solution {
     public long solution(int n, int[] times) {
+        Arrays.sort(times);
+        
         long startMinute = 1;
-        long endMinute = 1_000_000_000_000_000_000L;
+        long endMinute = (long) n * times[0];
         
         while (startMinute < endMinute) {
             long midMinute = (startMinute + endMinute) / 2;
