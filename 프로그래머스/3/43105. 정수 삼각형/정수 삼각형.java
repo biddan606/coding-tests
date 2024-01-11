@@ -10,12 +10,9 @@ class Solution {
             }
             triangle[row][triangle[row].length - 1] += triangle[row - 1][triangle[row].length - 2];
         }
-        
-        int pathMax = 0;
-        for (int pathValue : triangle[triangle.length - 1]) {
-            pathMax = Math.max(pathMax, pathValue);
-        }
-        
-        return pathMax;
+
+        return Arrays.stream(triangle[triangle.length - 1])
+                .max()
+                .getAsInt();
     }
 }
