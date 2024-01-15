@@ -1,73 +1,58 @@
 import java.util.*;
 
 class Solution {
-    private final int[][] maxMemory = new int[202][202];
-    private final int[][] minMemory = new int[202][202];
-    
-    public int solution(String arr[]) {
-        for (int[] row : maxMemory) {
-            Arrays.fill(row, Integer.MIN_VALUE);
+    public int solution(String[] arr) {
+        List<Integer> numbers = new ArrayList<>();
+        List<String> operators = new ArrayList<>();
+        for (String s : arr) {
+            switch (s) {
+                case "+":
+                case "-":
+                    operators.add(s);
+                    break;
+                default:
+                    numbers.add(Integer.parseInt(s));
+            }
         }
-        for (int[] row : minMemory) {
-            Arrays.fill(row, Integer.MAX_VALUE);
+
+        int[][] memory = new int[numbers.size()][numbers.size()];
+        for (int[] row : memory) {
+            Arrays.fill(row, -1);
         }
-        
-        return max(0, arr.length, arr);
+
+        for (int start = 0; start < memory.length; start++) {
+            memory[start][start] = numbers.get(start);
+
+            for (int end = start + 1; end < memory.length; end++) {
+                memory[start][end] = memory[start][end - 1] + convertNumber(operators.get(end - 1), numbers.get(end));
+            }
+        }
+
+        return calculateMax(0, memory, operators, 0, 1000 * -101);
     }
-    
-    private int max(int start, int end, String[] array) {
-        if (end - start == 1) {
-            return Integer.parseInt(array[start]);
+
+    private int convertNumber(String operator, int number) {
+        if (operator.equals("-")) {
+            return  -number;
         }
-        if (maxMemory[start][end] != Integer.MIN_VALUE) {
-            return maxMemory[start][end];
+        return number;
+    }
+
+    private int calculateMax(int start, int[][] memory, List<String> operators, int current, int result) {
+        if (start == memory.length) {
+            return Math.max(current, result);
         }
-        
-        int max = Integer.MIN_VALUE;
-        for (int i = start + 1; i < end; i += 2) {
-            int left = max(start, i, array);
-            
-            int value;
-            if (array[i].equals("+")) {
-                int right = max(i + 1, end, array);
-                value = left + right;
-            } else { // array[i].equals("-")
-                int right = min(i + 1, end, array);
-                value = left - right;
+
+        for (int end = start; end < memory.length; end++) {
+            String operator = "+";
+            if (start != 0) {
+                operator = operators.get(start - 1);
             }
             
-            max = Math.max(max, value);
+            int addingNumber = convertNumber(operator, memory[start][end]);
+            result = Math.max(result, calculateMax(end + 1, memory, operators, current + addingNumber, result));
         }
-        
-        maxMemory[start][end] = max;
-        return max;
-    }
-    
-    private int min(int start, int end, String[] array) {
-        if (end - start == 1) {
-            return Integer.parseInt(array[start]);
-        }
-        if (minMemory[start][end] != Integer.MAX_VALUE) {
-            return minMemory[start][end];
-        }
-        
-        int min = Integer.MAX_VALUE;
-        for (int i = start + 1; i < end; i += 2) {
-            int left = min(start, i, array);
-            
-            int value;
-            if (array[i].equals("+")) {
-                int right = min(i + 1, end, array);
-                value = left + right;
-            } else { // array[i].equals("-")
-                int right = max(i + 1, end, array);
-                value = left - right;
-            }
-            
-            min = Math.min(min, value);
-        }
-        
-        minMemory[start][end] = min;
-        return min;
+
+        return result;
     }
 }
