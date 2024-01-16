@@ -2,20 +2,21 @@ import java.util.*;
 
 class Solution {
     boolean solution(String s) {
-        Deque<Character> stack = new ArrayDeque<>();
+        int count = 0;
         
         for (char c : s.toCharArray()) {
             switch(c) {
-                    case '(' -> stack.addFirst(c);
+                    case '(' -> count++;
                     case ')' -> {
-                        if (stack.isEmpty()) {
+                        if (count == 0) {
                             return false;
                         }
-                        stack.removeFirst();
+                        
+                        count--;
                     }
             }
         }
         
-        return stack.isEmpty();
+        return count == 0;
     }
 }
