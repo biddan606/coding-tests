@@ -1,11 +1,12 @@
 import java.util.*;
+import java.util.stream.*;
 
 class Solution {
     public int solution(int[] bandage, int health, int[][] attacks) {
-        int attackMaxTime = 0;
-        for (int[] attack : attacks) {
-            attackMaxTime = Math.max(attackMaxTime, attack[0]);
-        }
+        int attackMaxTime = Arrays.stream(attacks)
+            .mapToInt(attack -> attack[0])
+            .max()
+            .orElse(0);
         
         int[] attackInfo = new int[attackMaxTime + 1];
         for (int[] attack : attacks) {
