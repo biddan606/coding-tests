@@ -7,7 +7,7 @@ class Solution {
         for (int i = 0; i < s.length(); i++) {
             String rotated = s.substring(i, s.length()) + s.substring(0, i);
             
-            if (isValid(rotated)) {
+            if (isCorrect(rotated)) {
                 result++;
             }
         }
@@ -15,34 +15,33 @@ class Solution {
         return result;
     }
     
-    private boolean isValid(String str) {
+    private boolean isCorrect(String str) {
         Deque<Character> stack = new ArrayDeque<>();
         
         for (Character c : str.toCharArray()) {
-            if (c == '[' || c == '(' || c == '{') {
-                stack.addFirst(c);
-                continue;
-            }
-            
-            if (stack.isEmpty()) {
-                return false;
-            }
-            Character top = stack.removeFirst();
-            
-            if (c == ']') {
-                if (top != '[') {
+            switch (c) {
+                case '[':
+                case '(':
+                case '{':
+                    stack.addFirst(c);
+                    continue;
+                case ']':
+                    if (stack.isEmpty() || stack.removeFirst() != '[') {
+                        return false;
+                    }
+                    break;
+                case ')':
+                    if (stack.isEmpty() || stack.removeFirst() != '(') {
+                        return false;
+                    }
+                    break;
+                case '}':
+                    if (stack.isEmpty() || stack.removeFirst() != '{') {
+                        return false;
+                    }
+                    break;
+                default:
                     return false;
-                }
-            } else if (c == ')') {
-                if (top != '(') {
-                    return false;
-                }
-            } else if (c == '}') {
-                if (top != '{') {
-                    return false;
-                }
-            } else {
-                return false;
             }
         }
         
