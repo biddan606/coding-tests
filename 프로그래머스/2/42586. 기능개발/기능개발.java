@@ -4,22 +4,22 @@ class Solution {
     public int[] solution(int[] progresses, int[] speeds) {
         List<Integer> deploymentCounts = new ArrayList<>();
         
-        int index = 0;
-        int day = 0;
-        while (index < progresses.length) {
-            int nextIndex = index;
-            while (nextIndex < progresses.length 
-                   && progresses[nextIndex] + speeds[nextIndex] * day >= 100) {
-                nextIndex++;
+        int count = 1;
+        int days = (int) Math.ceil((double) (100 - progresses[0]) / speeds[0]);
+        
+        for (int i = 1; i < progresses.length; i++) {
+            int expiration = (int) Math.ceil((double) (100 - progresses[i]) / speeds[i]);
+            
+            if (expiration > days) {
+                deploymentCounts.add(count);
+                count = 0;
+                days = expiration;
             }
             
-            if (nextIndex - index > 0) {
-                deploymentCounts.add(nextIndex - index);
-            }
-            
-            index = nextIndex;
-            day++;
+            count++;
         }
+        
+        deploymentCounts.add(count);
         
         return deploymentCounts.stream()
             .mapToInt(Integer::intValue)
