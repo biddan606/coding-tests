@@ -20,28 +20,17 @@ class Solution {
         
         for (Character c : str.toCharArray()) {
             switch (c) {
-                case '[':
-                case '(':
-                case '{':
-                    stack.addFirst(c);
-                    continue;
-                case ']':
-                    if (stack.isEmpty() || stack.removeFirst() != '[') {
+                case '[' -> stack.addFirst(']');
+                case '(' -> stack.addFirst(')');
+                case '{' -> stack.addFirst('}');
+                case ']', ')', '}' -> {
+                    if (stack.isEmpty()) {
                         return false;
                     }
-                    break;
-                case ')':
-                    if (stack.isEmpty() || stack.removeFirst() != '(') {
+                    if (stack.removeFirst() != c) {
                         return false;
                     }
-                    break;
-                case '}':
-                    if (stack.isEmpty() || stack.removeFirst() != '{') {
-                        return false;
-                    }
-                    break;
-                default:
-                    return false;
+                }
             }
         }
         
