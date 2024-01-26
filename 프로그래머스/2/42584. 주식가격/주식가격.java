@@ -2,27 +2,25 @@ import java.util.*;
 
 class Solution {
     public int[] solution(int[] prices) {
-        // 스택 원소: [index, value]
-        Deque<int[]> stack = new ArrayDeque<>();
+        Deque<Integer> stack = new ArrayDeque<>();
         int[] result = new int[prices.length];
         
         for (int i = 0; i < prices.length; i++) {
             int price = prices[i];
             
-            while (!stack.isEmpty() && stack.getFirst()[1] > price) {
-                int[] top = stack.removeFirst();
-                int topIndex = top[0];
+            while (!stack.isEmpty() && prices[stack.getFirst()] > price) {
+                int topIndex = stack.removeFirst();
                 
                 result[topIndex] = i - topIndex;
             }
             
-            stack.addFirst(new int[]{i, price});
+            stack.addFirst(i);
         }
         
         while (!stack.isEmpty()) {
-            int[] top = stack.removeFirst();
+            int topIndex = stack.removeFirst();
             
-            result[top[0]] = prices.length - 1 - top[0];
+            result[topIndex] = prices.length - 1 - topIndex;
         }
         
         return result;
