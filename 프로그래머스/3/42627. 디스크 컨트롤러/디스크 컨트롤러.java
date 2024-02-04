@@ -14,7 +14,7 @@ class Solution {
             jobsIndex = insert(minHeap, jobs, jobsIndex, currentTime);
             // 작업을 진행한다. 현재 진행할 수 있는 작업이 없다면 시간을 1초 증가시킨다.
             if (minHeap.isEmpty()) {
-                currentTime++;
+                currentTime = jobs[jobsIndex][0];
                 continue;
             }
             Task task = minHeap.remove();
