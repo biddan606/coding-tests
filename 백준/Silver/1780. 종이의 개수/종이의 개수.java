@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        // 입력
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         int inputSize = Integer.parseInt(reader.readLine());
@@ -14,43 +13,38 @@ public class Main {
             lines[i] = reader.readLine().split(" ");
         }
 
-        // [0]: -1의 개수, [1]: 0의 개수, [2]: 1의 개수
-        long[] counts = new long[3];
+        long[] counts = new long[3]; // -1, 0, 1의 개수를 저장할 배열
+        countPapers(lines, counts, 0, 0, inputSize);
 
-        count(lines, counts, 0, 0, lines.length, lines.length);
-
-        // 출력
         for (long count : counts) {
             System.out.println(count);
         }
-
-        reader.close();
     }
 
-    private static boolean count(String[][] lines, long[] counts, int startRow, int startCol, int endRow, int endCol) {
-        String value = lines[startRow][startCol];
-        int plusValue = (endRow - startRow) / 3;
-        if (plusValue == 0) {
+    private static void countPapers(String[][] lines, long[] counts, int startRow, int startCol, int size) {
+        if (isUniform(lines, startRow, startCol, size)) {
+            String value = lines[startRow][startCol];
             counts[Integer.parseInt(value) + 1]++;
-            return true;
+            return;
         }
 
-        boolean result = true;
-        for (int row = startRow; row < endRow; row += plusValue) {
-            for (int col = startCol; col < endCol; col += plusValue) {
-                if (!count(lines, counts, row, col, row + plusValue, col + plusValue)) {
-                    result = false;
-                }
-                if (!value.equals(lines[row][col])) {
-                    result = false;
+        int newSize = size / 3;
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                countPapers(lines, counts, startRow + row * newSize, startCol + col * newSize, newSize);
+            }
+        }
+    }
+
+    private static boolean isUniform(String[][] lines, int startRow, int startCol, int size) {
+        String firstValue = lines[startRow][startCol];
+        for (int i = startRow; i < startRow + size; i++) {
+            for (int j = startCol; j < startCol + size; j++) {
+                if (!lines[i][j].equals(firstValue)) {
+                    return false;
                 }
             }
         }
-
-        if (result) {
-            counts[Integer.parseInt(value) + 1] -= 8;
-        }
-
-        return result;
+        return true;
     }
 }
