@@ -1,46 +1,42 @@
 import java.util.*;
-import java.util.stream.*;
 
 class Solution {
     public int solution(int n, int[][] computers) {
-        // 모든 컴퓨터를 돌며 컴퓨터끼리 연결한다.
-        Map<Integer, Integer> linked = new HashMap<>();
+        // 해당 컴퓨터와 연결된 컴퓨터들을 방문 처리한다.
+        boolean[] visited = new boolean[computers.length];
+        int count = 0;
         
         for (int i = 0; i < computers.length; i++) {
-            if (linked.containsKey(i)) {
+            if (visited[i]) {
                 continue;
             }
             
-            for (int j = 0; j < computers[i].length; j++) {
-                link(computers, i, linked, i);
-            }
+            link(computers, i, visited);
+            count++;
         }
         
-        // 존재하는 네트워크 개수를 반환한다.
-        List<Integer> result = linked.values().stream()
-            .distinct()
-            .collect(Collectors.toList());
-        return result.size();
+        return count;
     }
     
-    private void link(int[][] computers, int startIndex, Map<Integer, Integer> linked, int linkNumber) {
-        Deque<Integer> indexes = new ArrayDeque<>();
-        indexes.addLast(startIndex);
+    private void link(int[][] computers, int startIndex, boolean[] visited) {
+        Deque<Integer> queue = new ArrayDeque<>();
+        queue.addLast(startIndex);
         
-        while (!indexes.isEmpty()) {
-            int currentIndex = indexes.removeFirst();
+        while (!queue.isEmpty()) {
+            int currentIndex = queue.removeFirst();
+            if (visited[currentIndex]) {
+                    continue;
+                }
+            visited[currentIndex] = true;
+            
             int[] current = computers[currentIndex];
             
             for (int nextIndex = 0; nextIndex < current.length; nextIndex++) {
-                if (current[nextIndex] == 0) {
-                    continue;
-                }
-                if (linked.containsKey(nextIndex)) {
+                if (computers[currentIndex][nextIndex] == 0) {
                     continue;
                 }
                 
-                linked.put(nextIndex, linkNumber);
-                indexes.addLast(nextIndex);
+                queue.addLast(nextIndex);
             }
         }
     }
