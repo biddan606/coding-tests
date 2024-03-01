@@ -1,39 +1,39 @@
 import java.util.*;
+import java.util.stream.*;
 
 class Solution {
     public int solution(int n, int[] lost, int[] reserve) {
-        SortedSet<Integer> reserveSet = new TreeSet<>();
-        for (int number : reserve) {
-            reserveSet.add(number);
-        }
+        Set<Integer> reserveSet = IntStream.of(reserve)
+            .boxed()
+            .collect(Collectors.toSet());
         
-        SortedSet<Integer> lostSet = new TreeSet<>();
-        for (int number : lost) {
-            if (reserveSet.contains(number)) {
-                reserveSet.remove(number);
-                continue;
+        Set<Integer> lostSet = IntStream.of(lost)
+            .boxed()
+            .collect(Collectors.toSet());
+        
+        SortedSet<Integer> actualReserveSet = new TreeSet<>(reserveSet);
+        actualReserveSet.removeAll(lostSet);
+        
+        SortedSet<Integer> actualLostSet = new TreeSet<>(lostSet);
+        actualLostSet.removeAll(reserveSet);
+        
+        Set<Integer> borrowedSet = new HashSet<>();
+        actualLostSet.forEach(l -> {
+            int prev = l - 1;
+            if (actualReserveSet.contains(prev)) {
+                actualReserveSet.remove(prev);
+                borrowedSet.add(l);
+                return;
             }
             
-            lostSet.add(number);
-        }
-        
-        int count = 0;
-        for (int number : lostSet) {
-            int prev = number - 1;
-            if (reserveSet.contains(prev)) {
-                reserveSet.remove(prev);
-                continue;
+            int next = l + 1;
+            if (actualReserveSet.contains(next)) {
+                actualReserveSet.remove(next);
+                borrowedSet.add(l);
+                return;
             }
-            
-            int next = number + 1;
-            if (reserveSet.contains(next)) {
-                reserveSet.remove(next);
-                continue;
-            }
-            
-            count++;
-        }
+        });
         
-        return n - count;
+        return n - actualLostSet.size() + borrowedSet.size();
     }
 }
