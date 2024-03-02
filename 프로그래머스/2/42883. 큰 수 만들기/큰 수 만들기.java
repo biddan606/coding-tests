@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.stream.*;
 
 class Solution {
     public String solution(String number, int k) {
@@ -13,14 +14,12 @@ class Solution {
             deque.addLast(c);
         }
         
-        while (k-- > 0) {
+        for (int i = 0; i < k; i++) {
             deque.removeLast();
         }
         
-        StringBuilder result = new StringBuilder();
-        while (!deque.isEmpty()) {
-            result.append(deque.removeFirst());
-        }
-        return result.toString();
+        return deque.stream()
+            .map(String::valueOf)
+            .collect(Collectors.joining());
     }
 }
