@@ -2,31 +2,20 @@ import java.util.*;
 
 class Solution {
     public int solution(int[][] routes) {
-        int[][] sortedRoutes = new int[routes.length][];
-        for (int r = 0; r < routes.length; r++) {
-            sortedRoutes[r] = new int[routes[r].length];
-            for (int c = 0; c < routes[c].length; c++) {
-                sortedRoutes[r][c] = routes[r][c];
-            }
-        }
+        int[][] sortedRoutes = Arrays.stream(routes)
+            .map(r -> Arrays.copyOf(r, r.length))
+            .toArray(int[][]::new);
         
-        Arrays.sort(sortedRoutes, (a, b) -> a[1] - b[1]);
+        Arrays.sort(sortedRoutes, (a, b) -> Integer.compare(a[1], b[1]));
             
-        int count = 0;
-        int min = Integer.MIN_VALUE;
-        int max = Integer.MIN_VALUE;
+        int count = 1;
+        int camera = sortedRoutes[0][1];
         
-        for (int[] r : sortedRoutes) {
-            if (r[0] <= min && min <= r[1]) {
-                continue;
+        for (int i = 1; i < sortedRoutes.length; i++) {
+            if (sortedRoutes[i][0] > camera) {
+                count++;
+                camera = sortedRoutes[i][1];
             }
-            if (r[0] <= max && max <= r[1]) {
-                continue;
-            }
-            
-            count++;
-            min = Math.min(min, r[1]);
-            max = Math.max(max, r[1]);
         }
         
         return count;
