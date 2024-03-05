@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.stream.*;
 
 class Solution {
     /*
@@ -8,97 +9,120 @@ class Solution {
     출발지 -> 산봉우리까지 가는 길만 구하면 된다.
     */
     public int[] solution(int n, int[][] paths, int[] gates, int[] summits) {
-        // 노드 초기화
-        Map<Integer, Node> nodes = new HashMap<>();
-        for (int i = 1; i <= n; i++) {
-            nodes.put(i, new Node(i));
-        }
+        Graph graph = new Graph();
+        IntStream.range(1, n + 1)
+            .forEach(graph::addNode);
         
-        // 간선 처리
-        for (int[] path : paths) {
-            Node node1 = nodes.get(path[0]);
-            Node node2 = nodes.get(path[1]);
-            int weight = path[2];
-            
-            node1.edges.add(new Edge(weight, node2));
-            node2.edges.add(new Edge(weight, node1));
-        }
+        Arrays.stream(paths)
+            .forEach(path -> graph.addEdge(path[0], path[1], path[2]));
         
-        // 산봉우리 등록
-        for (int summit : summits) {
-            nodes.get(summit).summitStatus = true;
-        }
-        
-        // 출발지 등록
-        PriorityQueue<QueueElement> pq = new PriorityQueue<>((e1, e2) -> e1.intensity - e2.intensity);
-        
-        for (int gate : gates) {
-            pq.offer(new QueueElement(0, nodes.get(gate)));
-        }
+        Arrays.stream(summits).forEach(summit -> graph.findNode(summit).summitFlag = true);
+    
+        PriorityQueue<QueueElement> pq = new PriorityQueue<>(Comparator.comparingInt(QueueElement::getIntensity));
+        Arrays.stream(gates)
+            .mapToObj(gate -> new QueueElement(graph.findNode(gate), 0))
+            .forEach(pq::offer);
         
         return bfs(pq);
     }
     
     private int[] bfs(PriorityQueue<QueueElement> pq) {
         int minIntensity = Integer.MAX_VALUE;
-        int summit = Integer.MAX_VALUE;
+        int summitId = Integer.MAX_VALUE;
         
         while (!pq.isEmpty()) {
             QueueElement current = pq.poll();
-            if (current.node.visited) {
+            Node currentNode = current.getNode();
+            int currentIntensity = current.getIntensity();
+                
+            if (currentNode.visited) {
                 continue;
             }
-            current.node.visited = true;
+            currentNode.visited = true;
             
-            if (current.node.summitStatus) {
-                if (minIntensity > current.intensity
-                   || (minIntensity == current.intensity && summit > current.node.number)) {
-                    minIntensity = current.intensity;
-                    summit = current.node.number;
+            if (currentNode.summitFlag) {
+                if (canUpdateMinPath(currentNode.id, currentIntensity, summitId, minIntensity)) {
+                    minIntensity = currentIntensity;
+                    summitId = currentNode.id;
                 }
                 continue;
             }
             
-            for (Edge e : current.node.edges) {
+            for (Edge e : currentNode.edges) {
                 if (e.weight > minIntensity) {
                     continue;
                 }
                 
-                pq.offer(new QueueElement(Math.max(current.intensity, e.weight), e.node));
+                pq.offer(new QueueElement(e.to, Math.max(currentIntensity, e.weight)));
             }
         }
             
-        return new int[]{summit, minIntensity};
+        return new int[]{summitId, minIntensity};
+    }
+    
+    private boolean canUpdateMinPath(int nextId, int nextIntensity, int currentId, int currentIntensity) {
+        if (currentIntensity > nextIntensity) {
+            return true;
+        }
+        return currentIntensity == nextIntensity && currentId > nextId;
     }
     
     private static class Node {
-        final int number;
-        final Set<Edge> edges = new HashSet<>();
+        final int id;
+        final List<Edge> edges = new ArrayList<>();
+        boolean summitFlag;
         boolean visited;
-        boolean summitStatus;
         
-        public Node(int number) {
-            this.number = number;
+        public Node(int id) {
+            this.id = id;
         }
     }
     
     private static class Edge {
+        final Node to;
         final int weight;
-        final Node node;
         
-        public Edge(int weight, Node node) {
+        public Edge(Node to, int weight) {
+            this.to = to;
             this.weight = weight;
-            this.node = node;
+        }
+    }
+    
+    private static class Graph {
+        final Map<Integer, Node> nodes = new HashMap<>();
+        
+        public void addNode(int id) {
+            nodes.putIfAbsent(id, new Node(id));
+        }
+        
+        public void addEdge(int fromId, int toId, int weight) {
+            Node fromNode = nodes.get(fromId);
+            Node toNode = nodes.get(toId);
+            
+            fromNode.edges.add(new Edge(toNode, weight));
+            toNode.edges.add(new Edge(fromNode, weight));
+        }
+        
+        public Node findNode(int id) {
+            return nodes.get(id);
         }
     }
     
     private static class QueueElement {
-        final int intensity;
         final Node node;
+        final int intensity;
         
-        public QueueElement(int intensity, Node node) {
-            this.intensity = intensity;
+        public QueueElement(Node node, int intensity) {
             this.node = node;
+            this.intensity = intensity;
+        }
+        
+        public Node getNode() {
+            return node;
+        }
+        
+        public int getIntensity() {
+            return intensity;
         }
     }
 }
