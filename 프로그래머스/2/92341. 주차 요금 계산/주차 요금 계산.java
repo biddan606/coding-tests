@@ -4,74 +4,104 @@ import java.lang.*;
 class Solution {
     public int[] solution(int[] fees, String[] records) {
         // 각 번호별로 입출차 시간을 얻는다.
-        Map<String, List<String>> timesByCarNumber = new HashMap<>();
-        for (String line : records) {
-            String[] tokens = line.split(" ");
-            String time = tokens[0];
+        Map<String, Car> cars = new HashMap<>();
+        for (String record : records) {
+            String[] tokens = record.split(" ");
+            int time = parseTime(tokens[0]);
             String carNumber = tokens[1];
             
-            timesByCarNumber.computeIfAbsent(carNumber, k -> new ArrayList<>())
-                .add(time);
+            cars.putIfAbsent(carNumber, new Car(carNumber));
+            Car car = cars.get(carNumber);
+            
+            boolean isIn = "IN".equals(tokens[2]);
+            if (isIn) {
+                car.in(time);
+            } else {
+                car.out(time);
+            }
+        }
+
+        // 출차가 안된 차들에 "23:59"로 시간을 계산한다.
+        cars.values().stream()
+            .filter(Car::isParked)
+            .forEach(car -> car.out(parseTime("23:59")));
+
+        // 각 번호별 요금을 계산한다.
+        Fee fee = new Fee(fees);
+        
+        return cars.values().stream()
+            .sorted(Comparator.comparing(Car::getNumber))
+            .mapToInt(car -> fee.cost(car.getParkTime()))
+            .toArray();
+    }
+    
+    private int parseTime(String time) {
+        int hour = Integer.parseInt(time.substring(0, 2));
+        int minute = Integer.parseInt(time.substring(3));
+        
+        return hour * 60 + minute;
+    }
+    
+    private static class Car {
+        private final String number;
+        private int inTime = -1;
+        private int parkTime;
+        
+        public Car(String number) {
+            this.number = number;
         }
         
-        // 각 번호별 요금을 계산한다.
-        int defaultTime = fees[0];
-        int defaultFee = fees[1];
-        int unitTime = fees[2];
-        int unitFee = fees[3];
-        
-        Map<String, Integer> feeByCarNumber = new HashMap<>();
-        for (Map.Entry<String, List<String>> e : timesByCarNumber.entrySet()) {
-            String carNumber = e.getKey();
-            List<String> times = e.getValue();
-            
-            int totalTime = 0;
-            for (int i = 0; i < times.size(); i += 2) {
-                String startTime = times.get(i);
-                
-                String endTime = "23:59";
-                if (i + 1 < times.size()) {
-                    endTime = times.get(i + 1);
-                }
-                
-                totalTime += calculateTimeDifference(startTime, endTime);
+        public void in(int time) {
+            if (isParked()) {
+                return;
             }
             
-            feeByCarNumber.put(carNumber, calculateFee(defaultTime, defaultFee, unitTime, unitFee, totalTime));
+            inTime = time;
         }
         
-        System.out.println(feeByCarNumber);
-        
-        
-        // 번호 오름차순으로 정렬한 요금을 반환한다.
-        return feeByCarNumber.entrySet().stream()
-            .sorted((e1, e2) -> Objects.compare(e1.getKey(), e2.getKey(), String::compareTo))
-            .mapToInt(e -> e.getValue())
-            .toArray();
-    }
-    
-    private int calculateTimeDifference(String startTime, String endTime) {
-        int[] splitedStartTime = Arrays.stream(startTime.split(":"))
-            .mapToInt(Integer::parseInt)
-            .toArray();
-        int start = splitedStartTime[0] * 60 + splitedStartTime[1];
-        
-        int[] splitedEndTime = Arrays.stream(endTime.split(":"))
-            .mapToInt(Integer::parseInt)
-            .toArray();
-        int end = splitedEndTime[0] * 60 + splitedEndTime[1];
-        
-        return end - start;
-    }
-    
-    private int calculateFee(int defaultTime, int defaultFee, int unitTime, int unitFee, int time) {
-        if (time <= defaultTime) {
-            return defaultFee;
+        public void out(int time) {
+            if (!isParked()) {
+                return;
+            }
+            
+            parkTime += time - inTime;
+            inTime = -1;
         }
         
-        int additionalTime = time - defaultTime;
-        int additionalFee = ((int) Math.ceil(additionalTime / (double) unitTime)) * unitFee;
+        public boolean isParked() {
+            return inTime != -1;
+        }
         
-        return defaultFee + additionalFee;
+        public String getNumber() {
+            return number;
+        }
+        
+        public int getParkTime() {
+            return parkTime;
+        }
+    }
+    
+    private static class Fee {
+        private final int baseTime;
+        private final int baseFee;
+        private final int unitTime;
+        private final int unitFee;
+        
+        public Fee(int[] feeInfo) {
+            this.baseTime = feeInfo[0];
+            this.baseFee = feeInfo[1];
+            this.unitTime = feeInfo[2];
+            this.unitFee = feeInfo[3];
+        }
+        
+        public int cost(int time) {
+            if (time <= baseTime) {
+                return baseFee;
+            }
+            
+            int additionalTime = time - baseTime;
+            
+            return baseFee + ((int) Math.ceil(additionalTime / (double) unitTime)) * unitFee;
+         }
     }
 }
