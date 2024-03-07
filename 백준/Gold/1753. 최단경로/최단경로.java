@@ -1,8 +1,11 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -32,10 +35,7 @@ public class Main {
         int edgeCount = firstLine[1];
         int startId = Integer.parseInt(reader.readLine());
 
-        Map<Integer, List<Edge>> edges = new HashMap<>();
-        for (int i = 1; i < verticesSize; i++) {
-            edges.putIfAbsent(i, new ArrayList<>());
-        }
+        Map<Integer, List<Edge>> graph = new HashMap<>();
 
         for (int i = 0; i < edgeCount; i++) {
             int[] line = readLineAsIntArray(reader);
@@ -43,19 +43,24 @@ public class Main {
             int toId = line[1];
             int weight = line[2];
 
-            edges.get(fromId).add(new Edge(toId, weight));
+            graph.putIfAbsent(fromId, new ArrayList<>());
+            graph.get(fromId).add(new Edge(toId, weight));
         }
+        reader.close();
 
-        dijkstra(distancesFromStartId, edges, startId);
+        dijkstra(distancesFromStartId, graph, startId);
 
+        StringBuilder sb = new StringBuilder();
         for (int i = 1; i < distancesFromStartId.length; i++) {
             if (distancesFromStartId[i] == UNVISITED) {
-                System.out.println("INF");
+                sb.append("INF\n");
                 continue;
             }
 
-            System.out.println(distancesFromStartId[i]);
+            sb.append(distancesFromStartId[i]).append("\n");
         }
+
+        System.out.println(sb);
     }
 
     private static int[] readLineAsIntArray(BufferedReader reader) throws IOException {
@@ -80,7 +85,7 @@ public class Main {
             }
             distancesFromStartId[currentId] = currentDistance;
 
-            for (Edge e : edges.get(currentId)) {
+            for (Edge e : edges.getOrDefault(currentId, Collections.emptyList())) {
                 pq.offer(new int[]{e.toId, distancesFromStartId[currentId] + e.weight});
             }
         }
