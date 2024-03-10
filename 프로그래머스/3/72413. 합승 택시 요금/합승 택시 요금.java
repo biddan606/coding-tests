@@ -6,12 +6,7 @@ class Solution {
         int[][] distances = new int[n + 1][n + 1];
         for (int from = 0; from <= n; from++) {
             Arrays.fill(distances[from], Integer.MAX_VALUE / 3);
-            
-            for (int to = 0; to <= n; to++) {
-                if (from == to) {
-                    distances[from][to] = 0;
-                }
-            }
+            distances[from][from] = 0;
         }
         
         for (int[] fare : fares) {
