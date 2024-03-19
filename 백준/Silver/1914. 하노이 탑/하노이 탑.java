@@ -29,20 +29,19 @@ public class Main {
     }
 
     private static BigInteger hanoi(int n, int from, int via, int to) {
-        if (n == 1) {
-            if (shouldRecordPath) {
-                transitionPaths.add(from + " " + to);
-            }
-
-            return BigInteger.ONE;
+        if (n == 0) {
+            return BigInteger.ZERO;
         }
 
         if (Objects.isNull(moveCountCache[n]) || shouldRecordPath) {
-            BigInteger moves = hanoi(n - 1, from, to, via)
-                    .add(hanoi(1, from, via, to))
-                    .add(hanoi(n - 1, via, from, to));
+            BigInteger movesBefore = hanoi(n - 1, from, to, via);
+            if (shouldRecordPath) {
+                transitionPaths.add(from + " " + to);
+            }
+            BigInteger movesAfter = hanoi(n - 1, via, from, to);
 
-            moveCountCache[n] = moves;
+            BigInteger totalMoves = movesBefore.add(BigInteger.ONE).add(movesAfter);
+            moveCountCache[n] = totalMoves;
         }
 
         return moveCountCache[n];
