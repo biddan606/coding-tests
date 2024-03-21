@@ -45,7 +45,7 @@ class Solution {
         if (scoreDifference > result.scoreDifference) {
             result.scoreDifference = scoreDifference;
             result.info = Arrays.copyOf(ryanInfo, ryanInfo.length);
-        } else if (scoreDifference == result.scoreDifference && compare(ryanInfo, result.info) > 0) {
+        } else if (scoreDifference == result.scoreDifference && isPriority(ryanInfo, result.info)) {
             result.info = Arrays.copyOf(ryanInfo, ryanInfo.length);
         }
     }
@@ -70,16 +70,19 @@ class Solution {
         return scoreDiffernece;
     }
     
-    private int compare(int[] info1, int[] info2) {
+    private boolean isPriority(int[] base, int[] comp) {
         for (int i = TARGET_LENGTH - 1; i >= 0; i--) {
-            if (info1[i] == info2[i]) {
+            if (base[i] == comp[i]) {
                 continue;
             }
             
-            return info1[i] - info2[i];
+            if (base[i] > comp[i]) {
+                return true;
+            }
+            return false;
         }
         
-        return 0;
+        return false;
     }
     
     private static class Result {
