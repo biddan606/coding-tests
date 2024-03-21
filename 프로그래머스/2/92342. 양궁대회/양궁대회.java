@@ -18,23 +18,10 @@ class Solution {
     }
     
     private void dfs(int[] ryanInfo, int[] apeachInfo,  int index, int n, Result result) {
-        if (n < 0) {
-            return;
-        }
-        
         if (index == TARGET_LENGTH - 1) {
             ryanInfo[index] = n;
-            int scoreDifference = calculateScoreDifference(ryanInfo, apeachInfo);
-            if (scoreDifference <= 0) {
-                return;
-            }
             
-            if (scoreDifference > result.scoreDifference) {
-                result.scoreDifference = scoreDifference;
-                result.info = Arrays.copyOf(ryanInfo, ryanInfo.length);
-            } else if (scoreDifference == result.scoreDifference && compare(ryanInfo, result.info) > 0) {
-                result.info = Arrays.copyOf(ryanInfo, ryanInfo.length);
-            }
+            updateResultIfBetter(ryanInfo, apeachInfo, result);
             
             ryanInfo[index] = 0;
             return;
@@ -42,12 +29,25 @@ class Solution {
         
         dfs(ryanInfo, apeachInfo, index + 1, n, result);
         
-        int hitCount = apeachInfo[index] + 1;
-        ryanInfo[index] = hitCount;
-            
-        dfs(ryanInfo, apeachInfo, index + 1, n - hitCount, result);
-        
-        ryanInfo[index] = 0;
+        if (n > apeachInfo[index]) {
+            ryanInfo[index] = apeachInfo[index] + 1;
+            dfs(ryanInfo, apeachInfo, index + 1, n - ryanInfo[index], result);
+            ryanInfo[index] = 0;
+        }
+    }
+    
+    private void updateResultIfBetter(int[] ryanInfo, int[] apeachInfo, Result result) {
+        int scoreDifference = calculateScoreDifference(ryanInfo, apeachInfo);
+        if (scoreDifference <= 0) {
+            return;
+        }
+
+        if (scoreDifference > result.scoreDifference) {
+            result.scoreDifference = scoreDifference;
+            result.info = Arrays.copyOf(ryanInfo, ryanInfo.length);
+        } else if (scoreDifference == result.scoreDifference && compare(ryanInfo, result.info) > 0) {
+            result.info = Arrays.copyOf(ryanInfo, ryanInfo.length);
+        }
     }
     
     private int calculateScoreDifference(int[] ryanInfo, int[] apeachInfo) {
