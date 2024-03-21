@@ -53,16 +53,14 @@ public class Main {
         int resultCost = Math.max(dp[0][NOT_ATTENDING], dp[0][ATTENDING]);
 
         List<Integer> resultPaths = new ArrayList<>();
-        boolean included = false;
-        if (dp[startId][NOT_ATTENDING] < dp[startId][ATTENDING]) {
-            included = true;
-        }
-        getPath(nodes, dp, startId, NON_EXISTENT_ID, included, resultPaths);
+        boolean included = dp[startId][NOT_ATTENDING] < dp[startId][ATTENDING];
+
+        traceOptimalPath(nodes, dp, startId, NON_EXISTENT_ID, included, resultPaths);
+        resultPaths.sort(Integer::compare);
 
         // 결과를 출력한다.
         System.out.println(resultCost);
         System.out.println(resultPaths.stream()
-                .sorted()
                 .map(String::valueOf)
                 .collect(Collectors.joining(" ")));
     }
@@ -93,7 +91,7 @@ public class Main {
         }
     }
 
-    private static void getPath(Node[] nodes, int[][] dp, int currentId, int prevId, boolean included,
+    private static void traceOptimalPath(Node[] nodes, int[][] dp, int currentId, int prevId, boolean included,
             List<Integer> paths) {
         Node node = nodes[currentId];
 
@@ -116,7 +114,7 @@ public class Main {
                 nextIncluded = true;
             }
 
-            getPath(nodes, dp, nextId, currentId, nextIncluded, paths);
+            traceOptimalPath(nodes, dp, nextId, currentId, nextIncluded, paths);
         }
     }
 
