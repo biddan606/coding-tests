@@ -1,51 +1,59 @@
 import java.util.*;
 
 class Solution {
-    public int solution(String begin, String target, String[] words) {
-        int result = dfs(words, new boolean[words.length], begin, target, 0);
-        
-        if (result == Integer.MAX_VALUE) {
-            result = 0;
-        }
-        return result;
-    }
-    
     /*
     1. words를 순회한다.
     2. currentWord와 nextWord의 글자 차이를 반환 받는다.
-    3. 차이가 1개라면 방문 처리하고 재귀한다.
-    4. 최소 깊이라면 최소 깊이를 갱신한다.
+    3. 차이가 1개이고 방문한 적 없다면, 방문 처리하고 큐에 쌓는다.
+        - 1번 방문한 노드는 다시 방문할 필요 없다. 이전에도 방문이 가능했기에 더 깊은 곳에서 방문할 필요가 없다.
+    4. 다시 1번부터 반복한다. 만약 뽑은 값이 타겟이라면 현재 뎁스를 반환한다.
+        - 큐에 쌓을 때 다음 뎁스는 맨 뒤로 이동한다. 그러므로 현재 뽑은 큐의 뎁스가 항상 가장 작은 뎁스이다.
     */
-    private int dfs(String[] words, boolean[] visitedWords, String current, String target, int depth) {
-        if (Objects.equals(current, target)) {
-            return depth;
-        }
+    public int solution(String begin, String target, String[] words) {
+        boolean[] visitedWords = new boolean[words.length];
         
-        int minDepth = Integer.MAX_VALUE;
+        Queue<Element> queue = new LinkedList<>();
+        queue.offer(new Element(begin, 0));
         
-        for (int i = 0; i < words.length; i++) {
-            if (visitedWords[i]) {
-                continue;
+        while (!queue.isEmpty()) {
+            Element element = queue.poll();
+            if (Objects.equals(element.str, target)) {
+                return element.depth;
             }
-            String next = words[i];
             
-            int difference = 0;
-            for (int p = 0; p < current.length(); p++) {
-                char baseCh = current.charAt(p);
-                char compCh = next.charAt(p);
-                if (baseCh != compCh) {
-                    difference++;
+            for (int i = 0; i < words.length; i++) {
+                if (visitedWords[i]) {
+                    continue;
                 }
-            }
-            if (difference != 1) {
-                continue;
-            }
+                String nextStr = words[i];
             
-            visitedWords[i] = true;
-            minDepth = Math.min(minDepth, dfs(words, visitedWords, next, target, depth + 1));
-            visitedWords[i] = false;
+                int difference = 0;
+                for (int p = 0; p < element.str.length(); p++) {
+                    char baseCh = element.str.charAt(p);
+                    char compCh = nextStr.charAt(p);
+                    if (baseCh != compCh) {
+                        difference++;
+                    }
+                }
+                if (difference != 1) {
+                    continue;
+                }
+            
+                visitedWords[i] = true;
+                queue.offer(new Element(nextStr, element.depth + 1));
+            }
         }
         
-        return minDepth;
+        return 0;
+    }
+    
+    private static class Element {
+        final String str;
+        final int depth;
+        
+        public Element(String str, int depth) {
+            this.str = str;
+            this.depth = depth;
+        }
     }
 }
