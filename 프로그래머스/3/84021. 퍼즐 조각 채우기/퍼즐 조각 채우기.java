@@ -1,5 +1,6 @@
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -16,15 +17,15 @@ class Solution {
     };
 
     public int solution(int[][] gameBoard, int[][] table) {
-        List<Piece> gameBoardPieces = getPieces(gameBoard, 0);
-        List<Piece> tablePieces = getPieces(table, 1);
+        Set<Piece> gameBoardPieces = getPieces(gameBoard, 0);
+        Set<Piece> tablePieces = getPieces(table, 1);
 
-        return fitPieces(gameBoardPieces, tablePieces);
+        return fitPeices(gameBoardPieces, tablePieces);
     }
 
-    private List<Piece> getPieces(int[][] map, int targetState) {
+    private Set<Piece> getPieces(int[][] map, int targetState) {
         boolean[][] visited = new boolean[map.length][map[0].length];
-        List<Piece> pieces = new ArrayList<>();
+        Set<Piece> pieces = new HashSet<>();
 
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[y].length; x++) {
@@ -72,34 +73,20 @@ class Solution {
         return 0 <= next.x && next.x < map[next.y].length;
     }
 
-    private int fitPieces(List<Piece> gameBoardPieces, List<Piece> tablePieces) {
+    private int fitPeices(Set<Piece> gameBoardPieces, Set<Piece> tablePieces) {
         int result = 0;
-        boolean[] visitedGameBoardPieces = new boolean[gameBoardPieces.size()];
 
         for (Piece source : tablePieces) {
             Piece current = source;
-            boolean matched = false;
 
-            for (int i = 0; i < gameBoardPieces.size(); i++) {
-                Piece target = gameBoardPieces.get(i);
-
-                if (visitedGameBoardPieces[i] || target.points.size() != current.points.size()) {
-                    continue;
-                }
-
-                for (int rotateCount = 0; rotateCount < 4; rotateCount++) {
-                    if (Objects.equals(target, current)) {
-                        visitedGameBoardPieces[i] = true;
-                        result += target.points.size();
-                        matched = true;
-                        break;
-                    }
-
-                    current = rotateRightAngle(current);
-                }
-                if (matched) {
+            for (int i = 0; i < 4; i++) {
+                if (gameBoardPieces.contains(current)) {
+                    gameBoardPieces.remove(current);
+                    result += current.points.size();
                     break;
                 }
+
+                current = rotateRightAngle(current);
             }
         }
 
@@ -136,52 +123,7 @@ class Solution {
         };
 
         int result1 = solution.solution(gameBoard1, table1);
-        System.out.println(result1);
-
-        int[][] gameBoard2 = {
-                {0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0},
-                {1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1},
-                {0, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0},
-                {0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0},
-                {0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1},
-                {1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0},
-                {0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1},
-                {1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0},
-                {0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0},
-                {1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1},
-                {0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0},
-                {1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0},
-                {0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0},
-                {1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1},
-                {1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0},
-                {0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0},
-                {0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0},
-                {0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0}
-        };
-
-        int[][] table2 = {
-                {1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0},
-                {0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0},
-                {1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1},
-                {1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1},
-                {1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1},
-                {0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0},
-                {1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1},
-                {0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0},
-                {1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1},
-                {1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0},
-                {1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0},
-                {0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1},
-                {1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
-                {1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1},
-                {0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0},
-                {1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1},
-                {0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1},
-                {0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1}
-        };
-
-        int result2 = solution.solution(gameBoard2, table2);
-        System.out.println(result2);
+        System.out.println(result1 == 14);
     }
 
     private static class Piece {
