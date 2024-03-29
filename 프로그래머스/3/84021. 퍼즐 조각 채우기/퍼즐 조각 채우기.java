@@ -1,6 +1,5 @@
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -17,15 +16,15 @@ class Solution {
     };
 
     public int solution(int[][] gameBoard, int[][] table) {
-        Set<Piece> gameBoardPieces = getPieces(gameBoard, 0);
-        Set<Piece> tablePieces = getPieces(table, 1);
+        List<Piece> gameBoardPieces = getPieces(gameBoard, 0);
+        List<Piece> tablePieces = getPieces(table, 1);
 
-        return fitPeices(gameBoardPieces, tablePieces);
+        return fitPieces(gameBoardPieces, tablePieces);
     }
 
-    private Set<Piece> getPieces(int[][] map, int targetState) {
+    private List<Piece> getPieces(int[][] map, int targetState) {
         boolean[][] visited = new boolean[map.length][map[0].length];
-        Set<Piece> pieces = new HashSet<>();
+        List<Piece> pieces = new ArrayList<>();
 
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[y].length; x++) {
@@ -73,20 +72,34 @@ class Solution {
         return 0 <= next.x && next.x < map[next.y].length;
     }
 
-    private int fitPeices(Set<Piece> gameBoardPieces, Set<Piece> tablePieces) {
+    private int fitPieces(List<Piece> gameBoardPieces, List<Piece> tablePieces) {
         int result = 0;
+        boolean[] visitedGameBoardPieces = new boolean[gameBoardPieces.size()];
 
         for (Piece source : tablePieces) {
             Piece current = source;
+            boolean matched = false;
 
-            for (int i = 0; i < 4; i++) {
-                if (gameBoardPieces.contains(current)) {
-                    gameBoardPieces.remove(current);
-                    result += current.points.size();
-                    break;
+            for (int i = 0; i < gameBoardPieces.size(); i++) {
+                Piece target = gameBoardPieces.get(i);
+
+                if (visitedGameBoardPieces[i] || target.points.size() != current.points.size()) {
+                    continue;
                 }
 
-                current = rotateRightAngle(current);
+                for (int rotateCount = 0; rotateCount < 4; rotateCount++) {
+                    if (Objects.equals(target, current)) {
+                        visitedGameBoardPieces[i] = true;
+                        result += target.points.size();
+                        matched = true;
+                        break;
+                    }
+
+                    current = rotateRightAngle(current);
+                }
+                if (matched) {
+                    break;
+                }
             }
         }
 
@@ -100,30 +113,6 @@ class Solution {
         }
 
         return new Piece(rightAnglePoints);
-    }
-
-    public static void main(String[] args) {
-        Solution solution = new Solution();
-
-        int[][] gameBoard1 = {
-                {1, 1, 0, 0, 1, 0},
-                {0, 0, 1, 0, 1, 0},
-                {0, 1, 1, 0, 0, 1},
-                {1, 1, 0, 1, 1, 1},
-                {1, 0, 0, 0, 1, 0},
-                {0, 1, 1, 1, 0, 0}
-        };
-        int[][] table1 = {
-                {1, 0, 0, 1, 1, 0},
-                {1, 0, 1, 0, 1, 0},
-                {0, 1, 1, 0, 1, 1},
-                {0, 0, 1, 0, 0, 0},
-                {1, 1, 0, 1, 1, 0},
-                {0, 1, 0, 0, 0, 0}
-        };
-
-        int result1 = solution.solution(gameBoard1, table1);
-        System.out.println(result1 == 14);
     }
 
     private static class Piece {
