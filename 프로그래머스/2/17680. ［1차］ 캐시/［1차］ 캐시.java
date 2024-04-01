@@ -1,39 +1,36 @@
 import java.util.*;
 
 class Solution {
-    
-    private final LinkedList<String> cache = new LinkedList<>();
-    
     public int solution(int cacheSize, String[] cities) {
         int runtime = 0;
+        Lru<String, String> lruCache = new Lru<>(cacheSize);
         
         for (String city : cities) {
             String cityLower = city.toLowerCase();
             
-            if (!cache.contains(cityLower)) {
-                runtime += 5;
+            if (lruCache.containsKey(cityLower)) {
+                ++runtime;
             } else {
-                runtime += 1;
+                runtime += 5;
             }
             
-            update(cityLower, cacheSize);
+            lruCache.put(cityLower, cityLower);
         }
         
         return runtime;
     }
     
-    private void update(String newCity, int cacheSize) {
-        if (cacheSize == 0) {
-            return;
+    private static class Lru<K, V> extends LinkedHashMap<K, V> {
+        private final int size;
+
+        protected Lru(int size) {
+            super(size, 0.75f, true);
+            this.size = size;
         }
-        
-        if (cache.contains(newCity)) {
-            cache.remove(newCity);
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+            return size() > size;
         }
-        while (cacheSize <= cache.size()) {
-            cache.removeFirst();    
-        }
-        
-        cache.add(newCity);
     }
 }
