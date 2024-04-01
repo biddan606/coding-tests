@@ -24,10 +24,12 @@ class Solution {
         private final int size;
 
         protected Lru(int size) {
+            // accessOrder == true이므로 갱신 시에 기존값이 존재하더라도 마지막으로 보낸다.
             super(size, 0.75f, true);
             this.size = size;
         }
 
+        // size보다 더 많은 값들을 가지고 있다면, 가장 오래된 엔트리를 삭제한다.
         @Override
         protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
             return size() > size;
