@@ -7,7 +7,7 @@ class Solution {
     결국 V 자 형태의 값들이 추출될 것이다.
     n == a.length 일 때, 
     0 -> n 까지 내림차순 값들과 n -> 0까지 오름차순 값들을 합치면 V 자 형태의 값들을 추출할 수 있다.
-    제일 작은 값은 
+    제일 작은 값은 중복되므로 제거해주어야 한다.
     */
     public int solution(int[] a) {
         List<Integer> descendingValues = getDescending(a);
