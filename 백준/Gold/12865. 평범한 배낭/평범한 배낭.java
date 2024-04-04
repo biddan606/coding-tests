@@ -23,25 +23,21 @@ class Main {
         }
         reader.close();
 
-        int[][] dp = new int[knapsackCount][maxWeight + 1];
-        for (int w = knapsacks[0].weight; w < dp[0].length; w++) {
-            dp[0][w] = knapsacks[0].value;
+        int[] maxValues = new int[maxWeight + 1];
+        for (int w = knapsacks[0].weight; w < maxValues.length; w++) {
+            maxValues[w] = knapsacks[0].value;
         }
 
-        for (int i = 1; i < dp.length; i++) {
+        for (int i = 1; i < knapsacks.length; i++) {
             Knapsack currentKnapsack = knapsacks[i];
 
-            for (int w = 0; w < dp[i].length; w++) {
-                if (currentKnapsack.weight > w) {
-                    dp[i][w] = dp[i - 1][w];
-                    continue;
-                }
-
-                dp[i][w] = Math.max(dp[i - 1][w], dp[i - 1][w - currentKnapsack.weight] + currentKnapsack.value);
+            // 0 -> maxValues.length - 1 순으로 비교할 경우, 현재 배낭이 누적될 수 있음
+            for (int w = maxValues.length - 1; w >= currentKnapsack.weight; w--) {
+                maxValues[w] = Math.max(maxValues[w], maxValues[w - currentKnapsack.weight] + currentKnapsack.value);
             }
         }
-        
-        System.out.println(dp[knapsackCount - 1][maxWeight]);
+
+        System.out.println(maxValues[maxWeight]);
     }
 
     private static class Knapsack {
