@@ -1,45 +1,61 @@
 import java.util.*;
 
 class Solution {
+    private static final int MIN_BASE_SCORE = 1;
+    private static final int MAX_BASE_SCORE = 20;
+    private static final int MIN_MULTIPLIER = 1;
+    private static final int MAX_MULTIPLIER = 3;
+    private static final int BULL_SCORE = 50;
+    
     public int[] solution(int target) {
-        Element[] dp = new Element[target + 1];
-        dp[0] = new Element(0, 0, 0);
+        // 추가 점수 목록을 만든다.
+        Map<Integer, List<Score>> extraScores = new HashMap<>();
         
-        for (int i = 1; i <= target; i++) {
-            List<Element> current = new ArrayList<>();
+        for (int base = MIN_BASE_SCORE; base <= MAX_BASE_SCORE; base++) {
+            for (int multiplier = MIN_MULTIPLIER; multiplier <= MAX_MULTIPLIER; multiplier++) {
+                int singleCount = 0;
+                if (multiplier == 1) {
+                    singleCount++;
+                }
+                Score score = new Score(1, singleCount, 0);
+                
+                extraScores.computeIfAbsent(base * multiplier, k -> new ArrayList<>())
+                    .add(score);
+            }
+        }
+        
+        // 불 경우의 수를 추가한다.
+        Score bullScore = new Score(1, 0, 1);
+        extraScores.computeIfAbsent(BULL_SCORE, k -> new ArrayList<>())
+                    .add(bullScore);
+        
+        // target까지 dp를 진행한다.
+        Score[] optimalScores = new Score[target + 1];
+        optimalScores[0] = new Score(0, 0, 0);
+                
+        for (int n = 1; n < optimalScores.length; n++) {
+            List<Score> possibleScores = new ArrayList<>();
             
-            for (int n = 1; n <= 20; n++) {
-                for (int coefficient = 1; coefficient <= 3; coefficient++) {
-                    int dif = n * coefficient;
-                    if (i - dif < 0) {
-                        continue;
-                    }
+            for (Map.Entry<Integer, List<Score>> entry : extraScores.entrySet()) {
+                int requiredScore = n - entry.getKey();
+                if (requiredScore < 0) {
+                    continue;
+                }
+                
+                for (Score extraScore : entry.getValue()) {
+                    Score prevScore = optimalScores[requiredScore];
                     
-                    Element prevElement = dp[i - dif];
-                    int nextTotalCount = prevElement.totalCount + 1;
-                    int nextSingleCount = prevElement.singleCount;
-                    if (coefficient == 1) {
-                        nextSingleCount++;
-                    }
-                    int nextBullCount = prevElement.bullCount;
+                    Score possibleScore = new Score(
+                        prevScore.totalCount + extraScore.totalCount,
+                        prevScore.singleCount + extraScore.singleCount,
+                        prevScore.bullCount + extraScore.bullCount
+                    );
                     
-                    Element newElement = 
-                        new Element(nextTotalCount, nextSingleCount, nextBullCount);
-                    current.add(newElement);
+                    possibleScores.add(possibleScore);
                 }
             }
             
-            if (i >= 50) {
-                Element prevElement = dp[i - 50];
-                int nextTotalCount = prevElement.totalCount + 1;
-                int nextSingleCount = prevElement.singleCount;
-                int nextBullCount = prevElement.bullCount + 1;
-                
-                Element newElement = new Element(nextTotalCount, nextSingleCount, nextBullCount);
-                current.add(newElement);
-            }
-            
-            current.sort((a, b) -> {
+            possibleScores.sort((a, b) -> {
                 if (a.totalCount == b.totalCount) {
                     return (b.singleCount + b.bullCount) - (a.singleCount + a.bullCount);
                 }
@@ -47,19 +63,22 @@ class Solution {
                 return a.totalCount - b.totalCount;
             });
             
-            dp[i] = current.get(0);
+            optimalScores[n] = possibleScores.get(0);
         }
         
-        int[] result = {dp[target].totalCount, dp[target].singleCount + dp[target].bullCount};
-        return result;
+        int[] result = {
+            optimalScores[target].totalCount, 
+            optimalScores[target].singleCount + optimalScores[target].bullCount
+            };
+        return result; 
     }
     
-    private static class Element {
+    private static class Score {
         final int totalCount;
         final int singleCount;
         final int bullCount;
         
-        public Element(int totalCount, int singleCount, int bullCount) {
+        public Score(int totalCount, int singleCount, int bullCount) {
             this.totalCount = totalCount;
             this.singleCount = singleCount;
             this.bullCount = bullCount;
