@@ -7,28 +7,23 @@ class Solution {
     private static final int MINERAL_EXTRACTION_COUNT = 5;
     
     public int solution(int[] picks, String[] minerals) {
-        if (isAllZero(picks)) {
-            return 0;
-        }
-        
         int minFatigue = Integer.MAX_VALUE;
         
         for (int pick = 0; pick < picks.length; pick++) {
             if (picks[pick] == 0) {
                 continue;
             }
+            
             picks[pick]--;
-            
-            minFatigue = Math.min(minFatigue, getMinFatigue(picks, minerals, pick, 0));
-            
+            minFatigue = Math.min(minFatigue, calculrateMinFatigue(picks, minerals, pick, 0));
             picks[pick]++;
         }
         
         return minFatigue;
     }
     
-    private int getMinFatigue(int[] picks, String[] minerals, int pick, int mineralsStartIndex) {
-        int fatigue = mine(pick, minerals, mineralsStartIndex, MINERAL_EXTRACTION_COUNT);
+    private int calculrateMinFatigue(int[] picks, String[] minerals, int pick, int mineralsStartIndex) {
+        int fatigue = extractMinerals(pick, minerals, mineralsStartIndex, MINERAL_EXTRACTION_COUNT);
         if (isAllZero(picks)) {
             return fatigue;
         }
@@ -39,17 +34,16 @@ class Solution {
             if (picks[nextPick] == 0) {
                 continue;
             }
+            
             picks[nextPick]--;
-            
-            minFatigue = Math.min(minFatigue, fatigue + getMinFatigue(picks, minerals, nextPick, mineralsStartIndex + MINERAL_EXTRACTION_COUNT));
-            
+            minFatigue = Math.min(minFatigue, fatigue + calculrateMinFatigue(picks, minerals, nextPick, mineralsStartIndex + MINERAL_EXTRACTION_COUNT));
             picks[nextPick]++;
         }
         
         return minFatigue;
     }
     
-    private int mine(int pick, String[] minerals, int startIndex, int extractionCount) {
+    private int extractMinerals(int pick, String[] minerals, int startIndex, int extractionCount) {
         int fatique = 0;
         
         for (int i = startIndex; i < Math.min(minerals.length, startIndex + extractionCount); i++) {            
