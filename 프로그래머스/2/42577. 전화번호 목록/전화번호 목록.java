@@ -1,23 +1,14 @@
 import java.util.*;
+import java.util.stream.*;
 
 class Solution {
     public boolean solution(String[] phoneBook) {
-        Set<String> phoneNumbers = new HashSet<>();
+        Set<String> phoneNumbers = new HashSet<>(Arrays.asList(phoneBook));
         
-        for (String phoneNumber : phoneBook) {
-            phoneNumbers.add(phoneNumber);
-        }
-        
-        for (String phoneNumber : phoneBook) {
-            for (int i = 1; i < phoneNumber.length(); i++) {
-                String prefix = phoneNumber.substring(0, i);
-                
-                if (phoneNumbers.contains(prefix)) {
-                    return false;
-                }
-            }
-        }
-        
-        return true;
+        return !phoneNumbers.stream()
+            .anyMatch(phoneNumber ->
+                      IntStream.range(1, phoneNumber.length())
+                      .anyMatch(i -> phoneNumbers.contains(phoneNumber.substring(0, i)))
+                     );
     }
 }
