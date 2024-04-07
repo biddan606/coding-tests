@@ -46,6 +46,7 @@ class Main {
 
     private static class MyList {
         private int mask;
+        private final StringBuilder buffer = new StringBuilder();
         private final BufferedWriter writer;
 
         public MyList(BufferedWriter writer) {
@@ -60,14 +61,13 @@ class Main {
             mask &= ~(1 << number);
         }
 
-        public void check(int number) throws IOException {
-            int result = 1;
+        public void check(int number) {
             if ((mask & (1 << number)) == 0) {
-                result = 0;
+                buffer.append('0');
+            } else {
+                buffer.append('1');
             }
-
-            writer.write('0' + result);
-            writer.write('\n');
+            buffer.append('\n');
         }
 
         public void toggle(int number) {
@@ -83,6 +83,7 @@ class Main {
         }
 
         public void print() throws IOException {
+            writer.write(buffer.toString());
             writer.flush();
         }
 
