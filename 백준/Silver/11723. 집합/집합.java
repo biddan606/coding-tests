@@ -19,22 +19,22 @@ class Main {
 
             switch (command) {
                 case "add": {
-                    int number = parseNumber(tokens[1]);
+                    int number = Integer.parseInt(tokens[1]);
                     myList.add(number);
                     break;
                 }
                 case "remove": {
-                    int number = parseNumber(tokens[1]);
+                    int number = Integer.parseInt(tokens[1]);
                     myList.remove(number);
                     break;
                 }
                 case "check": {
-                    int number = parseNumber(tokens[1]);
+                    int number = Integer.parseInt(tokens[1]);
                     myList.check(number);
                     break;
                 }
                 case "toggle": {
-                    int number = parseNumber(tokens[1]);
+                    int number = Integer.parseInt(tokens[1]);
                     myList.toggle(number);
                     break;
                 }
@@ -53,17 +53,6 @@ class Main {
 
         reader.close();
         myList.destroy();
-    }
-
-    private static int parseNumber(String str) {
-        int result = 0;
-
-        for (char c : str.toCharArray()) {
-            result *= 10;
-            result += c - '0';
-        }
-
-        return result;
     }
 
     private static class MyList {
