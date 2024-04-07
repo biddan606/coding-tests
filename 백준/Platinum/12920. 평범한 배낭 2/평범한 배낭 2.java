@@ -82,7 +82,7 @@ class Main {
             itemCounts.add(current);
 
             remainder -= twoSquare;
-            twoSquare *= 2;
+            twoSquare <<= 1;
         }
 
         return itemCounts;
