@@ -10,61 +10,45 @@ class Main {
         String[] firstLine = reader.readLine().split(" ");
         int guitarCount = Integer.parseInt(firstLine[0]);
 
-        long[] availableSongsBit = new long[guitarCount];
-        for (int g = 0; g < availableSongsBit.length; g++) {
+        long[] songsAvailabilityBit = new long[guitarCount];
+        for (int g = 0; g < songsAvailabilityBit.length; g++) {
             String[] tokens = reader.readLine().split(" ");
             String songsYesOrNo = tokens[1];
 
             for (int s = 0; s < songsYesOrNo.length(); s++) {
                 char yesOrNo = songsYesOrNo.charAt(s);
-                if (yesOrNo == 'N') {
-                    continue;
+                if (yesOrNo == 'Y') {
+                    songsAvailabilityBit[g] |= 1L << s;
                 }
 
-                availableSongsBit[g] |= 1L << s;
             }
         }
         reader.close();
 
-        int maxAvailableSongs = 0;
+        int maxSongs = 0;
         int minGuitars = -1;
 
-        for (int guitarsBit = 0; guitarsBit < (1 << guitarCount); guitarsBit++) {
-            long sumOfAvailableSongsBit = 0;
+        for (int selectedGuitarsBit = 0; selectedGuitarsBit < (1 << guitarCount); selectedGuitarsBit++) {
+            long combinedSongsBit = 0;
 
             for (int g = 0; g < guitarCount; g++) {
-                if (((1 << g) & guitarsBit) == 0) {
+                if (((1 << g) & selectedGuitarsBit) == 0) {
                     continue;
                 }
 
-                sumOfAvailableSongsBit |= availableSongsBit[g];
+                combinedSongsBit |= songsAvailabilityBit[g];
             }
 
-            int availableSongs = countBits(sumOfAvailableSongsBit);
-            int selectedGuitars = countBits(guitarsBit);
+            int availableSongs = Long.bitCount(combinedSongsBit);
+            int selectedGuitars = Integer.bitCount(selectedGuitarsBit);
 
-            if (availableSongs > maxAvailableSongs) {
-                maxAvailableSongs = availableSongs;
-                minGuitars = selectedGuitars;
-            } else if (availableSongs == maxAvailableSongs && minGuitars > selectedGuitars) {
-                maxAvailableSongs = availableSongs;
+            if (availableSongs > maxSongs ||
+                    (availableSongs == maxSongs && minGuitars > selectedGuitars)) {
+                maxSongs = availableSongs;
                 minGuitars = selectedGuitars;
             }
         }
 
         System.out.println(minGuitars);
-    }
-
-    private static int countBits(long bits) {
-        int count = 0;
-
-        while (bits != 0) {
-            if (((bits & 1) != 0)) {
-                count++;
-            }
-            bits >>= 1;
-        }
-
-        return count;
     }
 }
