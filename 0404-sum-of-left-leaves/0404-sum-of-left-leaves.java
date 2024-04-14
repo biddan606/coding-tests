@@ -18,11 +18,11 @@ class Solution {
         return sumLeftLeaves(root, false);
     }
 
-    private int sumLeftLeaves(TreeNode node, boolean isLeft) {
+    private int sumLeftLeaves(TreeNode node, boolean isLeftChild) {
         if (node == null) {
             return 0;
         }
-        if (isLeaf(node) && isLeft) {
+        if (isLeaf(node) && isLeftChild) {
             return node.val;
         }
 
