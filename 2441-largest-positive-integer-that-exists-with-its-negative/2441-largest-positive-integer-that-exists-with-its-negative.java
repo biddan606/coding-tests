@@ -1,23 +1,23 @@
 class Solution {
     public int findMaxK(int[] nums) {
-        // 양의 정수들을 얻는다.
-        Set<Integer> positive = new HashSet<>();
+        // 음수들를 얻는다.
+        Set<Integer> negative = new HashSet<>();
         for (int n : nums) {
-            if (n > 0) {
-                positive.add(n);
+            if (n < 0) {
+                negative.add(n);
             }
         }
 
-        // 양의 정수로 존재하면서, 가장 작은 음수를 찾는다.
-        int min = 1; // 기본값
+        // 음수가 존재하는 경우에만 최대값을 갱신한다.
+        int max = -1; // 기본값
         for (int n : nums) {
-            if (!positive.contains(-n)) {
+            if (!negative.contains(-n)) {
                 continue;
             }
 
-            min = Math.min(min, n);
+            max = Math.max(max, n);
         }
 
-        return -min;
+        return max;
     }
 }
