@@ -1,30 +1,54 @@
 class Solution {
     public double mincostToHireWorkers(int[] quality, int[] wage, int k) {
-        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());
-        List<Pair<Double, Integer>> ratio = new ArrayList<>();
-        int n = quality.length, qualitySum = 0;
-        double res = Double.MAX_VALUE, maxRate = 0.0;
+        int n = quality.length;
+        double minCost = Double.MAX_VALUE;
+        double qualityTillNow = 0;
 
-        for (int i = 0; i < n; ++i) {
-            ratio.add(new Pair<>((double) wage[i] / quality[i], i));
+        List<Worker> workers = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            workers.add(new Worker(wage[i] / (double) quality[i], quality[i]));
         }
 
-        ratio.sort(Comparator.comparingDouble(p -> p.getKey()));
-        for (int i = 0; i < k; ++i) {
-            qualitySum += quality[ratio.get(i).getValue()];
-            maxRate = Math.max(maxRate, ratio.get(i).getKey());
-            maxHeap.offer(quality[ratio.get(i).getValue()]);
+        // Sorting workers by their wage-quality ratio
+        Collections.sort(workers);
+
+        // Max-heap for the qualities using a comparator
+        PriorityQueue<Integer> highQualityWorkers = new PriorityQueue<>(Comparator.reverseOrder());
+
+        for (Worker worker : workers) {
+            double ratio = worker.ratio;
+            int qua = worker.quality;
+
+            qualityTillNow += qua;
+            highQualityWorkers.add(qua);
+
+            if (highQualityWorkers.size() > k) {
+                qualityTillNow -= highQualityWorkers.poll();
+            }
+
+            if (highQualityWorkers.size() == k) {
+                minCost = Math.min(minCost, qualityTillNow * ratio);
+            }
         }
 
-        res = maxRate * qualitySum;
-        for (int i = k; i <n; ++i) {
-            maxRate = Math.max(maxRate, ratio.get(i).getKey());
-            qualitySum -= maxHeap.poll();
-            qualitySum += quality[ratio.get(i).getValue()];
-            maxHeap.offer(quality[ratio.get(i).getValue()]);
-            res = Math.min(res, maxRate * qualitySum);
+        return minCost;
+    }
+
+    // Helper class to store the ratio and quality and implement comparable for
+    // sorting
+    private class Worker implements Comparable<Worker> {
+        double ratio;
+        int quality;
+
+        Worker(double ratio, int quality) {
+            this.ratio = ratio;
+            this.quality = quality;
         }
 
-        return res;
+        @Override
+        public int compareTo(Worker other) {
+            return Double.compare(this.ratio, other.ratio);
+        }
     }
 }
