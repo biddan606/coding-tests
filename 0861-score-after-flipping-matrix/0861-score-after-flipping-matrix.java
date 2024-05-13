@@ -8,7 +8,6 @@ class Solution {
             }
         }
 
-        int halfRows = grid.length / 2;
         for (int col = 0; col < grid[0].length; col++) {
             int currentOnes = 0;
 
@@ -18,7 +17,7 @@ class Solution {
                 }
             }
 
-            if (currentOnes <= halfRows) {
+            if (currentOnes * 2 < grid.length) {
                 toggle(grid, col);
             }
         }
