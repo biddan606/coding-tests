@@ -11,14 +11,14 @@ class Solution {
 
         for (int row = 0; row < grid.length; row++) {
             for (int col = 0; col < grid[row].length; col++) {
-                maxGold = Math.max(maxGold, collectGold(grid, row, col));
+                maxGold = Math.max(maxGold, backtracking(grid, row, col));
             }
         }
 
         return maxGold;
     }
 
-    private static int collectGold(int[][] grid, int row, int col) {
+    private static int backtracking(int[][] grid, int row, int col) {
         if (!validateRange(grid, row, col) || grid[row][col] == 0) {
             return 0;
         }
@@ -31,7 +31,7 @@ class Solution {
             int nextRow = direction[0] + row;
             int nextCol = direction[1] + col;
 
-            maxGold = Math.max(maxGold, originalGold + collectGold(grid, nextRow, nextCol));
+            maxGold = Math.max(maxGold, originalGold + backtracking(grid, nextRow, nextCol));
         }
 
         grid[row][col] = originalGold;
