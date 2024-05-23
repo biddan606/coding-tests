@@ -40,9 +40,7 @@ class Solution {
                 continue;
             }
 
-            String substring = str.substring(begin, end + 1);
-
-            currentPartition.add(substring);
+            currentPartition.add(str.substring(begin, end + 1));
             findPartitions(str, end + 1, currentPartition);
             currentPartition.remove(currentPartition.size() - 1);
         }
