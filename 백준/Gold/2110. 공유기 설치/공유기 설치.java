@@ -50,10 +50,12 @@ public class Main {
         int lastInstalledLocation = locations[0];
 
         for (int i = 1; i < locations.length; i++) {
-            if (locations[i] - lastInstalledLocation >= distance) {
-                lastInstalledLocation = locations[i];
-                count++;
+            if (locations[i] - lastInstalledLocation < distance) {
+                continue;
             }
+
+            lastInstalledLocation = locations[i];
+            count++;
         }
 
         return count;
