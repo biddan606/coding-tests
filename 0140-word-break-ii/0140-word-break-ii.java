@@ -1,20 +1,25 @@
 class Solution {
-    List<String> result;
+    private List<String> result;
+    private Map<Integer, List<String>> memoization;
+    private Set<String> words;
 
     public List<String> wordBreak(String s, List<String> wordDict) {
-        Set<String> words = new HashSet<>(wordDict);
+        words = new HashSet<>(wordDict);
         result = new ArrayList<>();
-        backtracking(s, 0, new ArrayList<>(), words);
+        memoization = new HashMap<>();
 
-        return result;
+        backtracking(s, 0);
+        return memoization.get(0);
     }
 
-    private void backtracking(String str, int beginIndex, List<String> substrings, Set<String> words) {
+    private void backtracking(String str, int beginIndex) {
+        if (memoization.containsKey(beginIndex)) {
+            return;
+        }
+
+        memoization.put(beginIndex, new ArrayList<>());
         if (str.length() == beginIndex) {
-            result.add(
-              substrings.stream()
-                .collect(Collectors.joining(" "))  
-            );
+            memoization.get(beginIndex).add("");
             return;
         }
 
@@ -24,9 +29,10 @@ class Solution {
                 continue;
             }
 
-            substrings.add(word);
-            backtracking(str, endIndex, substrings, words);
-            substrings.remove(substrings.size() - 1);
+            backtracking(str, endIndex);
+            for (String suffix : memoization.getOrDefault(endIndex, Collections.emptyList())) {
+                memoization.get(beginIndex).add(word + (suffix.equals("") ? "" : " " + suffix));
+            }
         }
     }
 }
