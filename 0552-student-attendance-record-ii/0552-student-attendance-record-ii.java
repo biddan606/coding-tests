@@ -36,14 +36,14 @@ public class Solution {
             dp = nextDp;
         }
 
-        int awards = 0;
+        int awardCases = 0;
         for (int absent = 0; absent < ABSENT_LIMIT; absent++) {
                 for (int late = 0; late < LATE_LIMIT; late++) {
-                    awards += dp[absent][late];
-                    awards %= MOD;
+                    awardCases += dp[absent][late];
+                    awardCases %= MOD;
                 }
         }
 
-        return awards;
+        return awardCases;
     }
 }
