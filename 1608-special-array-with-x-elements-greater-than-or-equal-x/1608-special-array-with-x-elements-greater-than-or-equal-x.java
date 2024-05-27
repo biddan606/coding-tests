@@ -1,17 +1,21 @@
 class Solution {
     public int specialArray(int[] nums) {
-        for (int x = 1; x <= 100; x++) {
-            int greaterAndEqualCount = 0;
+        Arrays.sort(nums);
+        int prevMax = -1;
+        
+        for (int x = nums.length; x >= 1; x--) {
+            int i = nums.length - x;
 
-            for (int n : nums) {
-                if (n >= x) {
-                    greaterAndEqualCount++;
-                }
+            if (prevMax >= x) {
+                prevMax = Math.max(prevMax, nums[i]);
+                continue;
             }
 
-            if (x == greaterAndEqualCount) {
+            if (x <= nums[i]) {
                 return x;
             }
+
+            prevMax = Math.max(prevMax, nums[i]);
         }
 
         return -1;
