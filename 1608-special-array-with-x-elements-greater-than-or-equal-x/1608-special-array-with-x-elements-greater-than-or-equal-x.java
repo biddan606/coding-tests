@@ -1,6 +1,6 @@
 class Solution {
     public int specialArray(int[] nums) {
-        for (int x = 1; x < 1000; x++) {
+        for (int x = 1; x <= 100; x++) {
             int greaterAndEqualCount = 0;
 
             for (int n : nums) {
