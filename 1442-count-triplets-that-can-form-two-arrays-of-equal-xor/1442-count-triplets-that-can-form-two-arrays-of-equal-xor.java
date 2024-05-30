@@ -1,16 +1,22 @@
 class Solution {
     public int countTriplets(int[] arr) {
         int range = arr.length;
+        int[][] prefixXor = new int[range][range];
+
+        for (int startIndex = 0; startIndex < range; startIndex++) {
+            prefixXor[startIndex][startIndex] = arr[startIndex];
+
+            for (int endIndexInclude = startIndex + 1; endIndexInclude < range; endIndexInclude++) {
+                prefixXor[startIndex][endIndexInclude] = prefixXor[startIndex][endIndexInclude - 1] ^ arr[endIndexInclude];
+            }
+        }
+
         int count = 0;
 
         for (int i = 0; i < range; i++) {
             for (int j = i + 1; j < range; j++) {
-                int a = xor(arr, i, j - 1);
-
                 for (int k = j; k < range; k++) {
-                    int b = xor(arr, j, k);
-
-                    if (a == b) {
+                    if (prefixXor[i][j - 1] == prefixXor[j][k]) {
                         count++;
                     }
                 }
@@ -18,15 +24,5 @@ class Solution {
         }
 
         return count;
-    }
-
-    private int xor(int[] array, int startIndex, int endIndexInclude) {
-        int result = 0;
-
-        for (int i = startIndex; i <= endIndexInclude; i++) {
-            result ^= array[i];
-        }
-
-        return result;
     }
 }
