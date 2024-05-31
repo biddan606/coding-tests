@@ -1,17 +1,21 @@
 class Solution {
     public int[] singleNumber(int[] nums) {
-        Set<Integer> set = new HashSet<>();
-
+        int xor = 0;
         for (int num : nums) {
-            if (set.contains(num)) {
-                set.remove(num);
+            xor ^= num;
+        }
+
+        int lowestBit = xor & -xor;
+        
+        int[] result = new int[2];
+        for (int num : nums) {
+            if ((lowestBit & num) == 0) {
+                result[0] ^= num; 
             } else {
-                set.add(num);
+                result[1] ^= num; 
             }
         }
 
-        return set.stream()
-                  .mapToInt(Integer::intValue)
-                  .toArray();
+        return result;
     }
 }
