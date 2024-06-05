@@ -1,44 +1,32 @@
 class Solution {
-    /**
-     * 1. 문자 등장 횟수 맵을 생성한다.
-        - 초기값은 (단어의 최대 개수 * 단어의 최대 길이)이다.
-     * 2. 단어들을 순회하며, 단어별 문자 등장 횟수를 구한다.
-     * 3. 단어의 문자 횟수로 맵의 카운트를 최소값으로 수정한다.
-     */
     public List<String> commonChars(String[] words) {
-        Map<Character, Integer> charCountMap = new HashMap<>();
+        // 각 문자의 최소 등장 횟수를 저장할 배열을 초기화합니다. ('a' ~ 'z')
+        int[] charCountMap = new int[26];
+        Arrays.fill(charCountMap, Integer.MAX_VALUE);
 
-        for (char c = 'a'; c <= 'z'; c++) {
-            charCountMap.put(c, 100 * 100);
-        }
-
+        // 각 단어를 순회하면서 문자 등장 횟수를 계산합니다.
         for (String word : words) {
-            Map<Character, Integer> map = new HashMap<>();
-
+            int[] tempCount = new int[26];
+            
+            // 단어 내 각 문자의 등장 횟수를 계산합니다.
             for (char c : word.toCharArray()) {
-                map.put(c, map.getOrDefault(c, 0) + 1);
+                tempCount[c - 'a']++;
             }
 
-            for (Map.Entry<Character, Integer> e : charCountMap.entrySet()) {
-                char key = e.getKey();
-                int originalValue = e.getValue();
-                
-                int wordCharValue = map.getOrDefault(key, 0);
-
-                charCountMap.put(key, Math.min(originalValue, wordCharValue));
+            // 최소 등장 횟수를 업데이트합니다.
+            for (int i = 0; i < 26; i++) {
+                charCountMap[i] = Math.min(charCountMap[i], tempCount[i]);
             }
         }
 
+        // 각 문자의 최소 등장 횟수만큼 결과 리스트에 추가합니다.
         List<String> result = new ArrayList<>();
-        for (Map.Entry<Character, Integer> e : charCountMap.entrySet()) {
-            char ch = e.getKey();
-            int count = e.getValue();
-
-            for (int i = 0; i < count; i++) {
-                result.add(Character.toString(ch));
+        for (int i = 0; i < 26; i++) {
+            for (int j = 0; j < charCountMap[i]; j++) {
+                result.add(String.valueOf((char) (i + 'a')));
             }
         }
-    
+
         return result;
     }
 }
