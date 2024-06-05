@@ -23,7 +23,7 @@ class Solution {
         List<String> result = new ArrayList<>();
         for (int i = 0; i < 26; i++) {
             for (int j = 0; j < charCountMap[i]; j++) {
-                result.add(String.valueOf((char) (i + 'a')));
+                result.add(Character.toString('a' + i));
             }
         }
 
