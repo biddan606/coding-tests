@@ -1,14 +1,14 @@
 class Solution {
     public int subarraysDivByK(int[] nums, int k) {
-        int cumulativeSum = 0;
+        int accumlatedSum = 0;
         Map<Integer, Integer> remainderCountMap = new HashMap<>();
         remainderCountMap.put(0, 1);
         int subarrayCount = 0;
 
         for (int num : nums) {
-            cumulativeSum += num;
+            accumlatedSum += num;
 
-            int remainder = cumulativeSum % k;
+            int remainder = accumlatedSum % k;
             if (remainder < 0) {
                 remainder += k;
             }
