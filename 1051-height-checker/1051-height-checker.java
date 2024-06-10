@@ -12,7 +12,7 @@ class Solution {
         for (int i = 0; i < heights.length; i++) {
             int h = heights[i];
 
-            int expectedMinIndex = h < 1 ? 0 : lessThanOrEqual[h - 1];
+            int expectedMinIndex = lessThanOrEqual[h - 1];
             int expectedMaxIndex = lessThanOrEqual[h] - 1;
 
             if (expectedMinIndex > i || expectedMaxIndex < i) {
