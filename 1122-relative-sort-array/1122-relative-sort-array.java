@@ -6,14 +6,15 @@ class Solution {
         }
 
         return Arrays.stream(arr1)
-                    .boxed()
-                    .sorted((a, b) -> {
-                        int aWeight = weightMap.getOrDefault(a, (a + 1) * 1001);
-                        int bWeight = weightMap.getOrDefault(b, (b + 1) * 1001);
+                     .boxed()
+                     .sorted((a, b) -> compareByWeight(a, b, weightMap))
+                     .mapToInt(Integer::intValue)
+                     .toArray();
+    }
 
-                        return aWeight - bWeight;
-                    })
-                    .mapToInt(Integer::intValue)
-                    .toArray();
+    private int compareByWeight(Integer a, Integer b, Map<Integer, Integer> weightMap) {
+        int aWeight = weightMap.getOrDefault(a, (a + 1) * 1001);
+        int bWeight = weightMap.getOrDefault(b, (b + 1) * 1001);
+        return Integer.compare(aWeight, bWeight);
     }
 }
