@@ -1,20 +1,33 @@
 class Solution {
     public int minIncrementForUnique(int[] nums) {
-        int[] counts = new int[200_000];
+        int[] numbers = new int[200_000];
+        int nonUniques = 0;
+        int min = 0;
         for (int num : nums) {
-            counts[num]++;
+            numbers[num]++;
+            if (numbers[num] > 1) {
+                nonUniques++;
+            }
+            min = Math.min(min, num);
         }
-        
+
         int moves = 0;
-        for (int i = 0; i < counts.length; i++) {
-            if (counts[i] < 2) {
-                continue;
+        int unallocated = 0;
+        int currentNumber = min;
+        while (nonUniques > 0) {
+            int currentCount = numbers[currentNumber];
+
+            if (currentCount > 1) {
+                int currentUnallocated = currentCount - 1;
+                moves -= currentUnallocated * currentNumber;
+                unallocated += currentUnallocated;
+            } else if (unallocated > 0 && currentCount == 0){
+                moves += currentNumber;
+                nonUniques--;
+                unallocated--;
             }
 
-            int currentMoves = counts[i] - 1;
-            counts[i + 1] += currentMoves;
-            moves += currentMoves;
-            counts[i] = 1;
+            currentNumber++;
         }
 
         return moves;
