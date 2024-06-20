@@ -1,9 +1,9 @@
 class Solution {
     public boolean judgeSquareSum(int c) {
-        double left = 0;
-        double right = Math.floor(Math.sqrt(c));
+        long left = 0;
+        long right = (long) Math.sqrt(c);
         while (left <= right) {
-            double sum = left * left + right * right;
+            long sum = left * left + right * right;
             if (sum == c) {
                 return true;
             } else if (sum > c) {
