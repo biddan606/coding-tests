@@ -5,27 +5,19 @@ class Solution {
 
         // 항상 가능한 고객들을 센다.
         for (int t = 0; t < size; t++) {
-            if (grumpy[t] == 0) {
-                customerCount += customers[t];
-            }
+            customerCount += (1 - grumpy[t]) * customers[t];
         }
 
         // 초기 영역을 구한다.
         for (int t = 0; t < minutes; t++) {
-            if (grumpy[t] == 1) {
-                customerCount += customers[t];
-            }
+            customerCount += grumpy[t] * customers[t];
         }
 
         // 구간별 가능한 최대 고객 수를 구한다.
         int maxCustomerCount = customerCount;
         for (int t = 0; t + minutes < size; t++) {
-            if (grumpy[t] == 1) {
-                customerCount -= customers[t];
-            }
-            if (grumpy[t + minutes] == 1) {
-                customerCount += customers[t + minutes];
-            }
+            customerCount -= grumpy[t] * customers[t];
+            customerCount += grumpy[t + minutes] * customers[t + minutes];
 
             maxCustomerCount = Math.max(maxCustomerCount, customerCount);
         }
