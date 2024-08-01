@@ -53,7 +53,7 @@ class Solution {
     }
 
     private boolean hasMoreLowScores(int[] ryanScores) {
-        for (int i = BOARD_SIZE - 1; i >= 0; i--) {
+        for (int i = bestStrategy.length - 1; i >= 0; i--) {
             if (bestStrategy[i] != ryanScores[i]) {
                 return ryanScores[i] > bestStrategy[i];
             }
