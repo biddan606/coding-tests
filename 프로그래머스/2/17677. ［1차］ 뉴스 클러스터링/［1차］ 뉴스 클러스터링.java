@@ -73,9 +73,7 @@ class Solution {
         int unionValuesSum = union.values()
                 .stream().mapToInt(Integer::intValue)
                 .sum();
-
-        System.out.println(intersectionValuesSum);
-        System.out.println(unionValuesSum);
+        
         return intersectionValuesSum / (double) unionValuesSum;
     }
 }
