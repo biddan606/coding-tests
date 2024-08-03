@@ -2,7 +2,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class Main {
@@ -20,8 +19,9 @@ public class Main {
 
         dfs(dwarfCandidates, 0, new ArrayList<>());
 
-        dwarves.sort(Comparator.comparingInt(a -> a));
-        printDwarves();
+        dwarves.stream()
+                .sorted()
+                .forEach(System.out::println);
     }
 
     private static void dfs(int[] dwarfCandidates, int index, List<Integer> current) {
@@ -42,11 +42,5 @@ public class Main {
         current.remove(current.size() - 1);
 
         dfs(dwarfCandidates, index + 1, current);
-    }
-
-    private static void printDwarves() {
-        for (Integer dwarf : dwarves) {
-            System.out.println(dwarf);
-        }
     }
 }
