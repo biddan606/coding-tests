@@ -1,12 +1,9 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 public class Main {
-
-    static List<Integer> dwarves = null;
 
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -17,30 +14,25 @@ public class Main {
         }
         reader.close();
 
-        dfs(dwarfCandidates, 0, new ArrayList<>());
+        int totalSum = Arrays.stream(dwarfCandidates).sum();
 
-        dwarves.stream()
-                .sorted()
-                .forEach(System.out::println);
-    }
-
-    private static void dfs(int[] dwarfCandidates, int index, List<Integer> current) {
-        if (dwarves != null) {
-            return;
-        }
-
-        if (dwarfCandidates.length == index) {
-            if (current.size() == 7 && current.stream().mapToInt(Integer::intValue).sum() == 100) {
-                dwarves = new ArrayList<>(current);
+        for (int firstOut = 0; firstOut < dwarfCandidates.length; firstOut++) {
+            for (int secondOut = firstOut + 1; secondOut < dwarfCandidates.length; secondOut++) {
+                if (totalSum - dwarfCandidates[firstOut] - dwarfCandidates[secondOut] == 100) {
+                    dwarfCandidates[firstOut] = 0;
+                    dwarfCandidates[secondOut] = 0;
+                    break;
+                }
             }
 
-            return;
+            if (dwarfCandidates[firstOut] == 0) {
+                break;
+            }
         }
 
-        current.add(dwarfCandidates[index]);
-        dfs(dwarfCandidates, index + 1, current);
-        current.remove(current.size() - 1);
-
-        dfs(dwarfCandidates, index + 1, current);
+        Arrays.sort(dwarfCandidates);
+        Arrays.stream(dwarfCandidates)
+                .skip(2)
+                .forEach(System.out::println);
     }
 }
