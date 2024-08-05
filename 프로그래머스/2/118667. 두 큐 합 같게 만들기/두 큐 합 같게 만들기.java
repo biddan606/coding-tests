@@ -1,6 +1,7 @@
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 class Solution {
     public int solution(int[] array1, int[] array2) {
@@ -11,7 +12,7 @@ class Solution {
         Queue<Integer> queue1 = convertToQueue(array1);
         Queue<Integer> queue2 = convertToQueue(array2);
 
-        for (int i = 0; i < totalElementCount * 2; i++) {
+        for (int i = 0; i <= array1.length * 3; i++) {
             if (queue1Sum == queue2Sum) {
                 return i;
             }
@@ -32,18 +33,14 @@ class Solution {
         return -1;
     }
 
-    private long sum(int[] queue1) {
-        return Arrays.stream(queue1)
+    private long sum(int[] array) {
+        return Arrays.stream(array)
                 .sum();
     }
 
     private Queue<Integer> convertToQueue(int[] array) {
-        Queue<Integer> queue = new LinkedList<>();
-
-        for (int i = 0; i < array.length; i++) {
-            queue.add(array[i]);
-        }
-
-        return queue;
+        return Arrays.stream(array)
+                .boxed()
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 }
