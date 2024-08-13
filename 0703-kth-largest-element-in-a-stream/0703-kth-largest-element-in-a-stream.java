@@ -1,38 +1,28 @@
 class KthLargest {
-    private final LinkedList<Integer> sorted;
-    private final int nthIndex;
+    private final PriorityQueue<Integer> minHeap;
+    private final int k;
 
     public KthLargest(int k, int[] nums) {
-        nthIndex = k - 1;
+        // 모든 값을 저장할 필요 없음, k개만 유지하면 됨
+        this.k = k;
+        minHeap = new PriorityQueue<>(k);
 
-        // 정렬된 LinkedList로 보관한다. 
-        // LinkedList가 add, get시 O(N)으로 빠름
-        sorted = Arrays.stream(nums)
-            .boxed()
-            .sorted(Collections.reverseOrder())
-            .collect(Collectors.toCollection(LinkedList::new));
+        for (int n : nums) {
+            minHeap.offer(n);
+            if (minHeap.size() > k) {
+                minHeap.poll();
+            }
+        }
     }
     
     public int add(int val) {
-        int indexToAdd = 0;
-        
-        for (int v : sorted) {
-            if (v <= val) {
-                break;
-            }
+        minHeap.offer(val);
 
-            indexToAdd++;
+        // 새로운 값이 추가되는 순간 k를 만족할 수 있음, 이 때는 제거해서는 안됨
+        if (minHeap.size() > k) {
+            minHeap.poll();
         }
 
-        sorted.add(indexToAdd, val);
-
-        return sorted.get(nthIndex);
+        return minHeap.peek();
     }
 }
-
-/**
- * Your KthLargest object will be instantiated and called as such:
- * KthLargest obj = new KthLargest(k, nums);
- * int param_1 = obj.add(val);
- */
- 
