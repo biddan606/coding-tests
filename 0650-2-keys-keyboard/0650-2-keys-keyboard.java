@@ -11,7 +11,7 @@ class Solution {
         Arrays.fill(minSteps, Integer.MAX_VALUE);
         minSteps[1] = 0;
 
-        for (int copiedLength = 1; copiedLength <= n / 2; copiedLength++) {
+        for (int copiedLength = 1; copiedLength < n; copiedLength++) {
             int nextSteps = minSteps[copiedLength] + 2;
             for (int i = copiedLength * 2; i <= n; i += copiedLength) {
                 minSteps[i] = Math.min(minSteps[i], nextSteps);
