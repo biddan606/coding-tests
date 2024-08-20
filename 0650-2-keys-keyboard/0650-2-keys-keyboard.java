@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 class Solution {
 
     public int minSteps(int n) {
@@ -5,18 +7,18 @@ class Solution {
             return 0;
         }
 
-        int steps = 0;
+        int[] minSteps = new int[n + 1];
+        Arrays.fill(minSteps, Integer.MAX_VALUE);
+        minSteps[1] = 0;
 
-        int current = n;
-        while (n > 1) {
-            if (n % 2 == 0) {
-                steps++;
+        for (int copiedLength = 1; copiedLength < n; copiedLength++) {
+            int nextSteps = minSteps[copiedLength] + 2;
+            for (int i = copiedLength * 2; i <= n; i += copiedLength) {
+                minSteps[i] = Math.min(minSteps[i], nextSteps);
+                nextSteps++;
             }
-
-            n = (n + 1) / 2;
-            steps++;
         }
 
-        return steps;
+        return minSteps[n];
     }
 }
