@@ -1,12 +1,6 @@
-import java.util.Arrays;
-
 class Solution {
 
     public int minSteps(int n) {
-        if (n == 1) {
-            return 0;
-        }
-
         int[] minSteps = new int[n + 1];
         Arrays.fill(minSteps, Integer.MAX_VALUE);
         minSteps[1] = 0;
