@@ -41,20 +41,26 @@ public class Main {
 
         // 합칠 파일의 개수
         for (int mergeSize = 2; mergeSize <= fileSizes.length; mergeSize++) {
-            // 합칠 파일의 시작 지점
-            for (int start = 0; start + mergeSize <= fileSizes.length; start++) {
-                int mergedFileSize = cumulativeSum[start + mergeSize] - cumulativeSum[start];
-
-                // 합칠 파일의 분기 지점 [시작][분기] + [분기][시작 + 합칠 파일 개수]
-                for (int endExclusive = start + 1; endExclusive < start + mergeSize; endExclusive++) {
-                    minMergerCost[start][start + mergeSize] =
-                            Math.min(minMergerCost[start][start + mergeSize],
-                                    minMergerCost[start][endExclusive] + minMergerCost[endExclusive][start + mergeSize] +
-                                            mergedFileSize);
-                }
-            }
+            updateMinMergeCost(fileSizes, mergeSize, cumulativeSum, minMergerCost);
         }
 
         return minMergerCost[0][fileSizes.length];
+    }
+
+    private static void updateMinMergeCost(int[] fileSizes, int mergeSize, int[] cumulativeSum, int[][] minMergerCost) {
+        // 합칠 파일의 시작 지점
+        for (int start = 0; start + mergeSize <= fileSizes.length; start++) {
+            int mergedFileSize = cumulativeSum[start + mergeSize] - cumulativeSum[start];
+            int endExclusive = start + mergeSize;
+
+            // 합칠 파일의 분기 지점 [시작][분기] + [분기][시작 + 합칠 파일 개수]
+            for (int midExclusive = start + 1; midExclusive < start + mergeSize; midExclusive++) {
+                int newCost = minMergerCost[start][midExclusive] +
+                        minMergerCost[midExclusive][endExclusive] +
+                        mergedFileSize;
+
+                minMergerCost[start][endExclusive] = Math.min(minMergerCost[start][endExclusive] , newCost);
+            }
+        }
     }
 }
