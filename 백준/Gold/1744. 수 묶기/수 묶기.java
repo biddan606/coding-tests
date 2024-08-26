@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class Main {
@@ -11,42 +12,47 @@ public class Main {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         int numberCount = Integer.parseInt(reader.readLine());
-        List<Integer> numbers = new ArrayList<>();
+
+        List<Integer> positives = new ArrayList<>();
+        List<Integer> negatives = new ArrayList<>();
+        boolean zeroPresence = false;
 
         for (int i = 0; i < numberCount; i++) {
             int n = Integer.parseInt(reader.readLine());
-            numbers.add(n);
+            if (n > 0) {
+                positives.add(n);
+            } else if (n < 0) {
+                negatives.add(n);
+            } else {
+                zeroPresence = true;
+            }
         }
         reader.close();
 
-        numbers.sort(Collections.reverseOrder());
+        positives.sort(Comparator.reverseOrder());
+        negatives.sort(Comparator.naturalOrder());
 
-        // 내림차순으로 1보다 큰 양수들을 곱한다.
         int result = 0;
 
-        int leftIndex = 0;
-        while (leftIndex + 1 < numbers.size() && numbers.get(leftIndex + 1) > 1) {
-            result += numbers.get(leftIndex) * numbers.get(leftIndex + 1);
-            leftIndex += 2;
+        int positivesIndex = 0;
+        while (positivesIndex + 1 < positives.size() && positives.get(positivesIndex + 1) > 1) {
+            result += positives.get(positivesIndex) * positives.get(positivesIndex + 1);
+            positivesIndex += 2;
         }
 
-        // 1 또는 남은 양수들을 더한다.
-        while (leftIndex < numbers.size() && numbers.get(leftIndex) > 0) {
-            result += numbers.get(leftIndex);
-            leftIndex++;
+        while (positivesIndex < positives.size()) {
+            result += positives.get(positivesIndex);
+            positivesIndex++;
         }
 
-        // 절대값이 큰 음수들을 곱한다.
-        int rightIndex = numbers.size() - 1;
-        while (rightIndex - 1 >= leftIndex && numbers.get(rightIndex - 1) < 0) {
-            result += numbers.get(rightIndex) * numbers.get(rightIndex - 1);
-            rightIndex -= 2;
+        int negativesIndex = 0;
+        while (negativesIndex + 1 < negatives.size()) {
+            result += negatives.get(negativesIndex) * negatives.get(negativesIndex + 1);
+            negativesIndex += 2;
         }
 
-        // 음수가 남았고, 0도 남았다면 서로 곱하여 0을 반환한다.
-        if (leftIndex < numbers.size() && numbers.get(leftIndex) != 0 &&
-                rightIndex >= 0 && numbers.get(rightIndex) < 0) {
-            result += numbers.get(rightIndex);
+        if (!zeroPresence && negativesIndex < negatives.size()) {
+            result += negatives.get(negativesIndex);
         }
 
         System.out.println(result);
