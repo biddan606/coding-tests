@@ -71,13 +71,8 @@ class Solution {
     }
 
     private boolean isSubIsland(int[][] mainGrid, List<Point> subIslandPoints) {
-        for (Point sp : subIslandPoints) {
-            if (mainGrid[sp.row][sp.col] == 0) {
-                return false;
-            }
-        }
-
-        return true;
+        return subIslandPoints.stream()
+                .allMatch(p -> mainGrid[p.row][p.col] == 1);
     }
 
     private static class Point {
