@@ -40,7 +40,7 @@ class Solution {
                 result[0] = key;
             } else if (value[1] == 0) { // 막대 모양 그래프의 마지막 노드는 outgoing edge가 없다
                 result[2]++;
-            } else if (value[0] >= 2 && value[1] == 2) {
+            } else if (value[0] >= 2 && value[1] == 2) { // 8자 모양 그래프의 중간 노드
                 result[3]++;
             }
         }
