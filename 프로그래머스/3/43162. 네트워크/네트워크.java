@@ -2,41 +2,37 @@ import java.util.*;
 
 class Solution {
     public int solution(int n, int[][] computers) {
-        // 해당 컴퓨터와 연결된 컴퓨터들을 방문 처리한다.
-        boolean[] visited = new boolean[computers.length];
+        boolean[] visited = new boolean[n];
         int count = 0;
         
-        for (int i = 0; i < computers.length; i++) {
+        for (int i = 0; i < n; i++) {
             if (visited[i]) {
                 continue;
             }
             
-            link(computers, i, visited);
+            link(computers, visited, i);
             count++;
         }
         
         return count;
     }
     
-    private void link(int[][] computers, int startIndex, boolean[] visited) {
-        Deque<Integer> queue = new ArrayDeque<>();
-        queue.addLast(startIndex);
+    private void link(int[][] computers, boolean[] visited, int startIndex) {
+        Queue<Integer> queue = new ArrayDeque<>();
+        queue.offer(startIndex);
         
         while (!queue.isEmpty()) {
-            int currentIndex = queue.removeFirst();
-            if (visited[currentIndex]) {
-                    continue;
-                }
-            visited[currentIndex] = true;
+            int index = queue.poll();
             
-            int[] current = computers[currentIndex];
+            if (visited[index]) {
+                continue;
+            }
+            visited[index] = true;
             
-            for (int nextIndex = 0; nextIndex < current.length; nextIndex++) {
-                if (computers[currentIndex][nextIndex] == 0) {
-                    continue;
+            for (int i = 0; i < computers[index].length; i++) {
+                if (computers[index][i] == 1) {
+                    queue.offer(i);
                 }
-                
-                queue.addLast(nextIndex);
             }
         }
     }
