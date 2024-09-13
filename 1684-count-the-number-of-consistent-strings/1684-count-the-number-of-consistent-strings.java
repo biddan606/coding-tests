@@ -9,7 +9,7 @@ class Solution {
         // words를 돌며 문자열의 문자가 allowed에 모두 포함되어 있다면 count++ 시킵니다.
         int count = 0;
         for (String word : words) {
-            if (match(allowedSet, word)) {
+            if (isConsistent(allowedSet, word)) {
                 count++;
             }
         }
@@ -17,13 +17,9 @@ class Solution {
         return count;
     }
 
-    private boolean match(Set<Character> set, String str) {
-        for (char c : str.toCharArray()) {
-            if (!set.contains(c)) {
-                return false;
-            }
-        }
-        
-        return true;
+    private boolean isConsistent(Set<Character> allowedChars, String word) {
+        return word.chars()
+                .mapToObj(ch -> (char) ch)
+                .noneMatch(ch -> !allowedChars.contains(ch));
     }
 }
