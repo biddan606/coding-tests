@@ -11,31 +11,33 @@ class Solution {
         Deque<Integer> shuttles = generateShuttles(n, t);
         Queue<Integer> crew = generateCrew(timetable);
 
-        Integer lastShuttle = null;
+        int lastShuttle = 0;
         int passengers = 0;
-        Integer lastCrew = null;
+        int lastCrew = 0;
+
         while (!shuttles.isEmpty()) {
-            lastShuttle = shuttles.removeFirst();
+            int currentShuttle = shuttles.removeFirst();
+            lastShuttle = currentShuttle;
             passengers = 0;
 
             while (!crew.isEmpty()
                     && passengers < m
-                    && lastShuttle >= crew.peek()) {
+                    && currentShuttle >= crew.peek()) {
                 lastCrew = crew.poll();
                 passengers++;
             }
         }
 
-        if (passengers == m && lastCrew != null) {
-            return toResult(Math.max(lastCrew - 1, 0));
+        if (passengers == m) {
+            return formatTime(Math.max(lastCrew - 1, 0));
         }
-        return toResult(lastShuttle);
+        return formatTime(lastShuttle);
     }
 
     private Deque<Integer> generateShuttles(int n, int t) {
         Deque<Integer> shuttles = new ArrayDeque<>();
         int currentShuttle = 9 * 60;
-        
+
         for (int i = 0; i < n; i++) {
             shuttles.addLast(currentShuttle);
             currentShuttle += t;
@@ -58,7 +60,7 @@ class Solution {
         return hours * 60 + minutes;
     }
 
-    private String toResult(int totalMinutes) {
+    private String formatTime(int totalMinutes) {
         int hours = totalMinutes / 60;
         int minutes = totalMinutes % 60;
         return String.format("%02d:%02d", hours, minutes);
