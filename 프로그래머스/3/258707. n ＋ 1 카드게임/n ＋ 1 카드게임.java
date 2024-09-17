@@ -15,13 +15,13 @@ class Solution {
         Set<Integer> handCards = generateHandCards(cardQueue);
         int targetNumber = cards.length + 1;
         int rounds = 1;
-        Set<Integer> drawableCards = new HashSet<>();
+        Set<Integer> pickableCards = new HashSet<>();
         int availableCoins = coin;
 
         while (!cardQueue.isEmpty()) {
-            drawableCards.addAll(drawCards(cardQueue));
+            pickableCards.addAll(drawCards(cardQueue));
             if (!playRound(handCards, targetNumber)) {
-                availableCoins -= pickCards(handCards, drawableCards, availableCoins, targetNumber);
+                availableCoins -= pickCards(handCards, pickableCards, availableCoins, targetNumber);
                 if (!playRound(handCards, targetNumber)) {
                     break;
                 }
@@ -64,19 +64,19 @@ class Solution {
         return drawnCards;
     }
 
-    private int pickCards(Set<Integer> handCards, Set<Integer> drawableCards, int coinLimit, int targetNumber) {
-        for (int card : drawableCards) {
+    private int pickCards(Set<Integer> handCards, Set<Integer> pickableCards, int coinLimit, int targetNumber) {
+        for (int card : pickableCards) {
             if (1 <= coinLimit && handCards.contains(targetNumber - card)) {
-                drawableCards.remove(card);
+                pickableCards.remove(card);
                 handCards.add(card);
                 return 1;
             }
         }
 
-        for (int card : drawableCards) {
-            if (2 <= coinLimit && drawableCards.contains(targetNumber - card)) {
-                drawableCards.remove(card);
-                drawableCards.remove(targetNumber - card);
+        for (int card : pickableCards) {
+            if (2 <= coinLimit && pickableCards.contains(targetNumber - card)) {
+                pickableCards.remove(card);
+                pickableCards.remove(targetNumber - card);
                 handCards.add(card);
                 handCards.add(targetNumber - card);
                 return 2;
