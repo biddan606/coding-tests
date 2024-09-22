@@ -18,33 +18,27 @@ public class Main {
         }
         br.close();
 
-        // [초][이동 횟수], [0]: 현재 위치, [1]: 획득한 자두의 개수
-        int[][][] dp = new int[seconds + 1][maxMoves + 1][2];
-        for (int m = 0; m <= maxMoves; m++) {
-            dp[0][m] = new int[]{1, 0};
-        }
+        // [초][이동 횟수]
+        int[][] dp = new int[seconds + 1][maxMoves + 1];
 
         for (int s = 1; s <= seconds; s++) {
             int plumLocation = plumLocations[s - 1];
-            dp[s][0] = new int[]{1, dp[s - 1][0][1] + match(1, plumLocation)};
+            dp[s][0] = dp[s - 1][0] + match(1, plumLocation);
 
             for (int m = 1; m <= maxMoves; m++) {
-                int currentLocation = dp[s - 1][m][0];
-                int stayed = dp[s - 1][m][1] + match(currentLocation, plumLocation);
-                int moved = dp[s - 1][m - 1][1] + 1;
+                int prevLocation = (m - 1) % 2 + 1;
+                int currentLocation = m % 2 + 1;
 
-                if (stayed < moved) {
-                    dp[s][m] = new int[]{plumLocation, moved};
-                } else {
-                    dp[s][m] = new int[]{currentLocation, stayed};
-                }
+                dp[s][m] = Math.max(dp[s - 1][m - 1] + match(prevLocation, plumLocation),
+                        dp[s - 1][m] + match(currentLocation, plumLocation));
             }
         }
 
         int maxCount = 0;
         for (int m = 0; m <= maxMoves; m++) {
-            maxCount = Math.max(maxCount, dp[seconds][m][1]);
+            maxCount = Math.max(maxCount, dp[seconds][m]);
         }
+
         System.out.println(maxCount);
     }
 
