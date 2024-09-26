@@ -1,51 +1,55 @@
 import java.util.Arrays;
 
 class Solution {
+
     public int[] sumPrefixScores(String[] words) {
         CountingNode root = new CountingNode();
         for (String word : words) {
-            addCount(word, root);
+            insertWord(word, root);
         }
 
         int[] result = new int[words.length];
         for (int i = 0; i < words.length; i++) {
-            result[i] = getCount(words[i], root);
+            result[i] = calculateWordScore(words[i], root);
         }
 
         return result;
     }
 
-    private void addCount(String word, CountingNode root) {
+    private void insertWord(String word, CountingNode root) {
         CountingNode current = root;
         for (char ch : word.toCharArray()) {
-            current = current.getNext(ch);
+            current = current.getChild(ch);
             current.increaseCount();
         }
     }
 
-    private int getCount(String word, CountingNode root) {
+    private int calculateWordScore(String word, CountingNode root) {
         CountingNode current = root;
-        int sum = 0;
+        int score = 0;
 
         for (char ch : word.toCharArray()) {
-            current = current.getNext(ch);
-            sum += current.getCount();
+            current = current.getChild(ch);
+            score += current.getCount();
         }
 
-        return sum;
+        return score;
     }
 
     private class CountingNode {
-        private final CountingNode[] next = new CountingNode['z' - 'a' + 1];
+
+        private final static int ALPHABET_SIZE = 'z' - 'a' + 1;
+
+        private final CountingNode[] children = new CountingNode[ALPHABET_SIZE];
         private int count = 0;
 
-        public CountingNode getNext(char ch) {
+        public CountingNode getChild(char ch) {
             int index = this.getIndex(ch);
-            if (next[index] == null) {
-                next[index] = new CountingNode();
+            if (children[index] == null) {
+                children[index] = new CountingNode();
             }
 
-            return next[index];
+            return children[index];
         }
 
         public void increaseCount() {
