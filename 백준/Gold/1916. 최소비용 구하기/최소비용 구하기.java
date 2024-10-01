@@ -1,7 +1,16 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 public class Main {
 
@@ -16,6 +25,7 @@ public class Main {
         }
 
         int edgeCount = Integer.parseInt(br.readLine());
+        Map<Integer, List<Edge>> edges = new HashMap<>();
         for (int i = 0; i < edgeCount; i++) {
             int[] token = Arrays.stream(br.readLine().split(" "))
                     .mapToInt(Integer::parseInt)
@@ -24,7 +34,8 @@ public class Main {
             int to = token[1] - 1;
             int weight = token[2];
 
-            cityDistances[from][to] = Math.min(weight, cityDistances[from][to]);
+            edges.computeIfAbsent(from, k -> new ArrayList<>())
+                    .add(new Edge(to, weight));
         }
 
         int[] target = Arrays.stream(br.readLine().split(" "))
@@ -32,15 +43,45 @@ public class Main {
                 .toArray();
         br.close();
 
-        for (int j = 0; j < cityCount; j++) {
-            for (int i = 0; i < cityCount; i++) {
-                for (int k = 0; k < cityCount; k++) {
-                    cityDistances[i][k] = Math.min(cityDistances[i][k],
-                            cityDistances[i][j] + cityDistances[j][k]);
-                }
+        int start = target[0];
+        int end = target[1];
+
+        PriorityQueue<Element> pq = new PriorityQueue<>(Comparator.comparingInt(e -> e.distance));
+        pq.offer(new Element(start, 0));
+
+        int[] distancesFromStart = new int[cityCount];
+        Arrays.fill(distancesFromStart, Integer.MAX_VALUE);
+
+        while (!pq.isEmpty()) {
+            Element element = pq.poll();
+            if (element.distance >= distancesFromStart[element.current]) {
+                continue;
             }
+            distancesFromStart[element.current] = element.distance;
+
+            edges.getOrDefault(element.current, Collections.emptyList())
+                    .forEach(e -> pq.offer(new Element(e.to, e.weight + element.distance)));
         }
 
-        System.out.println(cityDistances[target[0]][target[1]]);
+        System.out.println(distancesFromStart[end]);
+    }
+    private static class Edge {
+        final int to;
+        final int weight;
+
+        public Edge(int to, int weight) {
+            this.to = to;
+            this.weight = weight;
+        }
+    }
+
+    private static class Element {
+        final int current;
+        final int distance;
+
+        public Element(int current, int distance) {
+            this.current = current;
+            this.distance = distance;
+        }
     }
 }
