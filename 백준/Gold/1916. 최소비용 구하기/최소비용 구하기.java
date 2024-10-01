@@ -49,21 +49,27 @@ public class Main {
         PriorityQueue<Element> pq = new PriorityQueue<>(Comparator.comparingInt(e -> e.distance));
         pq.offer(new Element(start, 0));
 
-        int[] distancesFromStart = new int[cityCount];
-        Arrays.fill(distancesFromStart, Integer.MAX_VALUE);
+        boolean[] visited = new boolean[cityCount];
+
+        int result = Integer.MAX_VALUE;
 
         while (!pq.isEmpty()) {
             Element element = pq.poll();
-            if (element.distance >= distancesFromStart[element.current]) {
+            if (element.current == end) {
+                result = element.distance;
+                break;
+            }
+
+            if (visited[element.current]) {
                 continue;
             }
-            distancesFromStart[element.current] = element.distance;
+            visited[element.current] = true;
 
             edges.getOrDefault(element.current, Collections.emptyList())
                     .forEach(e -> pq.offer(new Element(e.to, e.weight + element.distance)));
         }
 
-        System.out.println(distancesFromStart[end]);
+        System.out.println(result);
     }
     private static class Edge {
         final int to;
