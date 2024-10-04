@@ -18,6 +18,8 @@ class Main {
             numbers[i] = i;
         }
 
+        StringBuilder sb = new StringBuilder();
+
         for (int i = 0; i < operationCount; i++) {
             int[] operationData = Arrays.stream(br.readLine().split(" "))
                     .mapToInt(Integer::parseInt)
@@ -31,11 +33,14 @@ class Main {
                     merge(numbers, number1, number2);
                     break;
                 case 1:
-                    printMatchResult(numbers, number1, number2);
+                    sb.append(getMatchResult(numbers, number1, number2))
+                            .append("\n");
                     break;
             }
         }
         br.close();
+
+        System.out.println(sb);
     }
 
     private static void merge(int[] numbers, int number1, int number2) {
@@ -54,12 +59,10 @@ class Main {
         return numbers[number];
     }
 
-    private static void printMatchResult(int[] numbers, int number1, int number2) {
-        String matchResult = "NO";
+    private static String getMatchResult(int[] numbers, int number1, int number2) {
         if (find(numbers, number1) == find(numbers, number2)) {
-            matchResult = "YES";
+            return  "YES";
         }
-
-        System.out.println(matchResult);
+        return "NO";
     }
 }
