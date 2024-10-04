@@ -30,13 +30,14 @@ class Main {
     }
 
     private static void dfs(Egg[] eggs, int left, Set<Integer> broken) {
-        maxValue = Math.max(maxValue, broken.size());
         if (left >= eggs.length) {
+            maxValue = Math.max(maxValue, broken.size());
             return;
         }
 
-        // left가 이미 깨진 경우
-        if (broken.contains(left)) {
+        // left가 이미 깨진 경우 또는 다른 계란과 칠 수 없는 경우, for문을 돌 수 없으므로 다음으로 넘어갑니다.
+        if (broken.contains(left)
+                || broken.size() >= eggs.length - 1) {
             dfs(eggs, left + 1, broken);
             return;
         }
