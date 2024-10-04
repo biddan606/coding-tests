@@ -13,11 +13,10 @@ class Main {
         int numberCount = firstLine[0];
         int operationCount = firstLine[1];
 
-        int[] numbers = new int[numberCount + 1];
-        for (int i = 0; i < numbers.length; i++) {
-            numbers[i] = i;
+        int[] parents = new int[numberCount + 1];
+        for (int i = 0; i < parents.length; i++) {
+            parents[i] = i;
         }
-
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < operationCount; i++) {
@@ -30,10 +29,11 @@ class Main {
 
             switch (operationType) {
                 case 0:
-                    merge(numbers, number1, number2);
+                    merge(parents, number1, number2);
                     break;
                 case 1:
-                    sb.append(getMatchResult(numbers, number1, number2))
+                    String matchResult = getMatchResult(parents, number1, number2);
+                    sb.append(matchResult)
                             .append("\n");
                     break;
             }
@@ -43,24 +43,24 @@ class Main {
         System.out.println(sb);
     }
 
-    private static void merge(int[] numbers, int number1, int number2) {
-        int parent1 = find(numbers, number1);
-        int parent2 = find(numbers, number2);
+    private static void merge(int[] parents, int number1, int number2) {
+        int parent1 = find(parents, number1);
+        int parent2 = find(parents, number2);
 
         if (parent1 != parent2) {
-            numbers[parent1] = parent2;
+            parents[parent2] = parent1;
         }
     }
 
-    private static int find(int[] numbers, int number) {
-        if (numbers[number] != number) {
-            numbers[number] = find(numbers, numbers[number]);
+    private static int find(int[] parents, int number) {
+        if (parents[number] != number) {
+            parents[number] = find(parents, parents[number]);
         }
-        return numbers[number];
+        return parents[number];
     }
 
-    private static String getMatchResult(int[] numbers, int number1, int number2) {
-        if (find(numbers, number1) == find(numbers, number2)) {
+    private static String getMatchResult(int[] parents, int number1, int number2) {
+        if (find(parents, number1) == find(parents, number2)) {
             return  "YES";
         }
         return "NO";
