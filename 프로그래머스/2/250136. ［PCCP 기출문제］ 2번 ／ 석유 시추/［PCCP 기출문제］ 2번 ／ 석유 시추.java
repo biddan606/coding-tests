@@ -1,94 +1,93 @@
 import java.util.*;
 
 class Solution {
-    
-    private static final int START_VALUE = 10_000;
-    private static final int[][] DIRECTS = {
-        {-1 , 0},
-        {0 , 1},
-        {1 , 0},
-        {0 , -1}
-    };
+    private int[][] oilsKeys;
+    private Map<Integer, Integer> oils = new HashMap<>();
     
     public int solution(int[][] land) {
-        int value = START_VALUE;
-        Map<Integer, Integer> valueCountMap = new HashMap<>();
+        int rows = land.length;
+        int cols = land[0].length;
+        int key = 1;
+        oilsKeys = new int[rows][cols];
         
-        for (int row = 0; row < land.length; row++) {
-            for (int col = 0; col < land[row].length; col++) {
-                if (land[row][col] == 1) {
-                    int count = bfs(land, row, col, value);
-                    
-                    valueCountMap.put(value, count);
-                    
-                    value++;
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                // (r, c)에서 석유를 추출할 수 있다면, 석유를 추출한다. 
+                if (land[r][c] == 0) {
+                    continue;
                 }
+                    
+                // 추출 후 해당 포인트인 석유를 추출할 수 없다.
+                // 석유가 추출된 포인트들에 total 추출량을 기록한다.
+                extractOils(land, new int[]{r, c}, key);
+                key++;
             }
         }
         
-        int maxResult = 0;
-        
-        for (int col = 0; col < land[0].length; col++) {
-            Set<Integer> valueSet = new HashSet<>();
-            
-            for (int row = 0; row < land.length; row++) {
-                if (land[row][col] == 0) {
+        int max = 0;
+        for (int c = 0; c < cols; c++) {
+            // column의 모든 row에서 total 추출량을 합산한다.
+            // 합산한 추출량의 max를 갱신한다.
+            int currentSum = 0;
+            Set<Integer> duplicatedKeys = new HashSet<>();
+            for (int r = 0; r < rows; r++) {
+                int currentKey = oilsKeys[r][c];
+                if (currentKey == 0) {
+                    continue;
+                }
+                if (duplicatedKeys.contains(currentKey)) {
                     continue;
                 }
                 
-                valueSet.add(land[row][col]);
+                duplicatedKeys.add(currentKey);
+                currentSum += oils.get(currentKey);
             }
             
-            int result = 0;
-            for (int v : valueSet) {
-                result += valueCountMap.get(v);
-            }
-            
-            maxResult = Math.max(maxResult, result);
+            max = Math.max(max, currentSum);
         }
         
-        return maxResult;
+        // max를 반환한다.
+        return max;
     }
     
-    private int bfs(int[][] land, int startRow, int startCow, int value) {
-        Deque<int[]> queue = new ArrayDeque<>();
-        queue.addLast(new int[]{startRow, startCow});
+    private void extractOils(int[][] land, int[] startPoint, int key) {
+        int rows = land.length;
+        int cols = land[0].length;
         
-        int count = 0;
+        Queue<int[]> queue = new ArrayDeque<>();
+        queue.offer(startPoint);
+        
+        int sum = 0;
+        int[][] directions = new int[][]{
+            {-1, 0}, {1, 0}, {0, -1}, {0, 1}
+        };
+        
         while (!queue.isEmpty()) {
-            int[] point = queue.removeFirst();
-            int row = point[0];
-            int col = point[1];
-            
-            if (land[row][col] == value) {
+            int[] currentPoint = queue.poll();
+            int currentRow = currentPoint[0];
+            int currentCol = currentPoint[1];
+            if (land[currentRow][currentCol] == 0) {
                 continue;
             }
-            land[row][col] = value;
-            count++;
             
-            for (int[] direct : DIRECTS) {
-                int nextRow = row + direct[0];
-                int nextCol = col + direct[1];
-                
-                if (isNotWithinRange(land, nextRow, nextCol)) {
+            oilsKeys[currentRow][currentCol] = key;
+            sum += land[currentRow][currentCol];
+            land[currentRow][currentCol] = 0;
+            
+            for (int[] d : directions) {
+                int nextRow = currentRow + d[0];
+                int nextCol = currentCol + d[1];
+                if (nextRow < 0 || nextRow >= rows || nextCol < 0 || nextCol >= cols) {
                     continue;
                 }
-                if (land[nextRow][nextCol] != 1) {
+                if (land[nextRow][nextCol] == 0) {
                     continue;
                 }
                 
-                queue.addLast(new int[]{nextRow, nextCol});
+                queue.offer(new int[]{nextRow, nextCol});
             }
         }
         
-        return count;
-    }
-    
-    private boolean isNotWithinRange(int[][] array, int row, int col) {
-        if (row < 0 || array.length <= row) {
-            return true;
-        }
-        
-        return col < 0 || array[row].length <= col;
+        oils.put(key, sum);
     }
 }
