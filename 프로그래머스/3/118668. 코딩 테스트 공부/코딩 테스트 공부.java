@@ -1,132 +1,57 @@
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Queue;
-import java.util.function.ToIntFunction;
-
 class Solution {
 
-    public int solution(int initialAlp, int initialCop, int[][] rawProblems) {
-        adjustProblemLevel(rawProblems, initialAlp, initialCop);
-
-        List<Problem> problems = convertToProblems(rawProblems);
-        addBasicProblems(problems);
-
-        return calculateMinTime(problems);
-    }
-
-    private void adjustProblemLevel(int[][] problems, int alpToAdjust, int copToAdjust) {
-        for (int i = 0; i < problems.length; i++) {
-            problems[i][0] = Math.max(0, problems[i][0] - alpToAdjust);
-            problems[i][1] = Math.max(0, problems[i][1] - copToAdjust);
+    public int solution(int alp, int cop, int[][] problems) {
+        // 최대 알고력과 코딩력을 구한다.
+        int maxAlgo = alp;
+        int maxCoding = cop;
+        for (int[] p : problems) {
+            maxAlgo = Math.max(maxAlgo, p[0]);
+            maxCoding = Math.max(maxCoding, p[1]);
         }
-    }
-
-    private List<Problem> convertToProblems(int[][] rawProblems) {
-        List<Problem> problems = new ArrayList<>();
-
-        for (int[] p : rawProblems) {
-            problems.add(new Problem(p[0], p[1], p[2], p[3], p[4]));
+        
+        // [알고력][코딩력], 최대 알고력과 최대 코딩력만큼 배열을 할당하고 큰 값으로 초기화한다.
+        int[][] dp = new int[maxAlgo + 1][maxCoding + 1];
+        for (int i = 0; i <= maxAlgo; i++) {
+            for (int j = 0; j <= maxCoding; j++) {
+                dp[i][j] = Integer.MAX_VALUE;
+            }
         }
 
-        return problems;
-    }
+        // 시작 지점 설정
+        dp[alp][cop] = 0;
 
-    private void addBasicProblems(List<Problem> problems) {
-        problems.add(new Problem(0, 0, 1, 0, 1));
-        problems.add(new Problem(0, 0, 0, 1, 1));
-    }
-
-    private int calculateMinTime(List<Problem> problems) {
-        int targetAlp = getMax(problems, p -> p.alp);
-        int targetCop = getMax(problems, p -> p.cop);
-
-        int[][] minTimes = initializeDp(targetAlp, targetCop);
-
-        Queue<State> queue = new ArrayDeque<>();
-        queue.offer(new State(0, 0, 0));
-
-        while (!queue.isEmpty()) {
-            State current = queue.poll();
-
-            for (Problem problem : problems) {
-                if (!current.canSolve(problem)) {
-                    continue;
+        // 알고력과 코딩력이 목표치에 도달할 때까지 dp 갱신
+        for (int algo = alp; algo <= maxAlgo; algo++) {
+            for (int coding = cop; coding <= maxCoding; coding++) {
+                if (algo < maxAlgo) {
+                    dp[algo + 1][coding] = Math.min(dp[algo + 1][coding], dp[algo][coding] + 1);
+                }
+                if (coding < maxCoding) {
+                    dp[algo][coding + 1] = Math.min(dp[algo][coding + 1], dp[algo][coding] + 1);
                 }
 
-                State next = current.solve(problem);
-                // 최대값을 넘지 못함
-                int nextAlp = Math.min(next.alp, targetAlp);
-                int nextCop = Math.min(next.cop, targetCop);
+                for (int[] p : problems) {
+                    if (algo >= p[0] && coding >= p[1]) {
+                        int nextAlgo = Math.min(maxAlgo, algo + p[2]);
+                        int nextCoding = Math.min(maxCoding, coding + p[3]);
+                        int cost = p[4];
 
-                if (next.time < minTimes[nextAlp][nextCop]) {
-                    minTimes[nextAlp][nextCop] = next.time;
-                    queue.offer(new State(nextAlp, nextCop, next.time));
+                        dp[nextAlgo][nextCoding] = Math.min(dp[nextAlgo][nextCoding], dp[algo][coding] + cost);
+                    }
                 }
             }
         }
 
-        return minTimes[targetAlp][targetCop];
+        return dp[maxAlgo][maxCoding];
     }
 
-    private int getMax(List<Problem> problems, ToIntFunction<Problem> getter) {
-        return problems.stream()
-                .mapToInt(getter)
-                .max()
-                .orElse(0);
-    }
+    public static void main(String[] args) {
+        int alp = 0;
+        int cop = 0;
+        int[][] problems = {{0, 0, 2, 1, 2}, {4, 5, 3, 1, 2}, {4, 11, 4, 0, 2}, {10, 4, 0, 4, 2}};
+        Solution solution = new Solution();
 
-    private int[][] initializeDp(int targetAlp, int targetCop) {
-        int[][] dp = new int[targetAlp + 1][targetCop + 1];
-
-        for (int[] row : dp) {
-            Arrays.fill(row, Integer.MAX_VALUE);
-        }
-        dp[0][0] = 0;
-
-        return dp;
-    }
-
-    private static class Problem {
-
-        final int alp;
-        final int cop;
-        final int alpRwd;
-        final int copRwd;
-        final int cost;
-
-        public Problem(int alp, int cop, int alpRwd, int copRwd, int cost) {
-            this.alp = alp;
-            this.cop = cop;
-            this.alpRwd = alpRwd;
-            this.copRwd = copRwd;
-            this.cost = cost;
-        }
-    }
-
-    private static class State {
-
-        final int alp;
-        final int cop;
-        final int time;
-
-        State(int alp, int cop, int time) {
-            this.alp = alp;
-            this.cop = cop;
-            this.time = time;
-        }
-
-        public boolean canSolve(Problem problem) {
-            return problem.alp <= alp && problem.cop <= cop;
-        }
-
-        public State solve(Problem problem) {
-            return new State(
-                    this.alp + problem.alpRwd,
-                    this.cop + problem.copRwd,
-                    this.time + problem.cost
-            );
-        }
+        int result = solution.solution(alp, cop, problems);
+        System.out.println(result);
     }
 }
