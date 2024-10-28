@@ -54,8 +54,4 @@ class Solution {
             this.depth = depth;
         }
     }
-
-    public static void main(String[] args) {
-
-    }
 }
