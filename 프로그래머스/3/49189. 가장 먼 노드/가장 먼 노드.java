@@ -41,7 +41,6 @@ class Solution {
             }
         }
 
-        // 마지막 depth를 반환한다.
         return lastDepthNodeCount;
     }
 
