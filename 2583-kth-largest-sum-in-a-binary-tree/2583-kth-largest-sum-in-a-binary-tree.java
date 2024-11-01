@@ -16,29 +16,36 @@
 class Solution {
     private Map<Integer, Long> levelSums;
     public long kthLargestLevelSum(TreeNode root, int k) {
-        levelSums = new HashMap<>();
-        calculateLevelSums(root, 1);
+        PriorityQueue<Long> pq = new PriorityQueue<>();
+        
+        Queue<TreeNode> nodes = new ArrayDeque<>();
+        nodes.offer(root);
 
-        // 레벨 합을 정렬한다.
-        List<Long> sorted = levelSums.values().stream()
-            .sorted((a, b) -> Long.compare(b, a))
-            .toList();
+        while (!nodes.isEmpty()) {
+            long currentLevelSum = 0;
+            int size = nodes.size();
 
-        // k번째 레벨 합을 반환한다.
-        if (sorted.size() < k) {
-            return -1;
-        }   
-        return sorted.get(k - 1);
-    }
+            for (int i = 0; i < size; i++) {
+                TreeNode current = nodes.poll();
+                currentLevelSum += current.val;
 
-    private void calculateLevelSums(TreeNode current, int level) {
-        if (current == null) {
-            return;
+                if (current.left != null) {
+                    nodes.offer(current.left);
+                }
+                if (current.right != null) {
+                    nodes.offer(current.right);
+                }
+            }
+
+            pq.offer(currentLevelSum);
+            while (pq.size() > k) {
+                pq.remove();
+            }
         }
 
-        levelSums.put(level, levelSums.getOrDefault(level, 0L) + current.val);
-
-        calculateLevelSums(current.left, level + 1);
-        calculateLevelSums(current.right, level + 1);
+        if (pq.size() < k) {
+            return -1;
+        }
+        return pq.peek();
     }
 }
