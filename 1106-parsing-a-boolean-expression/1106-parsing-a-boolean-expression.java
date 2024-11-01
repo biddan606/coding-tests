@@ -22,7 +22,7 @@ class Solution {
             } else if (c == '!' || c == '&' || c == '|') {
                 index += 2;
                 List<Boolean> subExpression = calculateExpression(expression);
-                result.add(calculateSubExpression(c, subExpression));
+                result.add(applyOperator(c, subExpression));
             }
 
             index++;
@@ -31,25 +31,12 @@ class Solution {
         return result;
     }
 
-    private static boolean calculateSubExpression(char operator, List<Boolean> subExpression) {
-        if (operator == '!') {
-            return !subExpression.get(0);
-        } else if (operator == '&') {
-            for (boolean e : subExpression) {
-                if (!e) {
-                    return false;
-                }
-            }
-            return true;
-        } else if (operator == '|') {
-            for (boolean e : subExpression) {
-                if (e) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        throw new IllegalArgumentException("잘못된 연산자입니다: %c".formatted(operator));
+    private boolean applyOperator(char operator, List<Boolean> results) {
+        return switch (operator) {
+            case '!' -> !results.get(0);
+            case '&' -> results.stream().allMatch(Boolean::booleanValue);
+            case '|' -> results.stream().anyMatch(Boolean::booleanValue);
+            default -> throw new IllegalArgumentException("잘못된 연산자입니다: %c".formatted(operator));
+        };
     }
 }
