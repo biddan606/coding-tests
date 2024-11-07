@@ -10,7 +10,6 @@ class Solution {
         }
 
         return Arrays.stream(bitDigits)
-                .max()
-                .orElse(Integer.MIN_VALUE);
+                .max().getAsInt();
     }
 }
