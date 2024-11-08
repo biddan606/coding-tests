@@ -21,17 +21,17 @@ public class Main {
                 .toArray();
         reader.close();
 
-        dfs(new ArrayList<>(), new boolean[size]);
+        dfs(new int[size], 0, new boolean[size]);
 
         // 결과 출력
         System.out.println(result);
     }
 
-    private static void dfs(List<Integer> list, boolean[] visited) {
-        if (list.size() == numbers.length) {
+    private static void dfs(int[] array, int depth, boolean[] visited) {
+        if (depth == numbers.length) {
             int currentResult = 0;
-            for (int i = 0; i + 1 < list.size(); i++) {
-                currentResult += Math.abs(list.get(i) - list.get(i + 1));
+            for (int i = 0; i + 1 < array.length; i++) {
+                currentResult += Math.abs(array[i + 1] - array[i]);
             }
 
             result = Math.max(currentResult, result);
@@ -44,11 +44,10 @@ public class Main {
             }
 
             visited[i] = true;
-            list.add(numbers[i]);
+            array[depth] = numbers[i];
 
-            dfs(list, visited);
+            dfs(array, depth + 1,  visited);
 
-            list.remove(list.size() - 1);
             visited[i] = false;
         }
     }
