@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -40,9 +42,13 @@ public class Main {
         }
 
         // 다음 순열 출력
-        System.out.println(Arrays.stream(permutation)
-                .mapToObj(String::valueOf)
-                .collect(Collectors.joining(" ")));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
+        for (int j : permutation) {
+            writer.append(String.valueOf(j))
+                    .append(" ");
+        }
+        writer.flush();
+        writer.close();
     }
 
     private static void swap(int[] permutation, int swapIndex, int targetIndex) {
