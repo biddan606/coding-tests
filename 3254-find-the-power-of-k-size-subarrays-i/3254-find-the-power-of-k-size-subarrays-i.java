@@ -10,7 +10,7 @@ class Solution {
         for (int d = 1; d < k; d++) {
             for (int i = 0; i + d < size; i++) {
                 dp[i][i + d] = -1;
-                if (dp[i][i + d - 1] != -1 && nums[i + d - 1] < nums[i + d]) {
+                if (dp[i][i + d - 1] != -1 && nums[i + d - 1] + 1 == nums[i + d]) {
                     dp[i][i + d] = nums[i + d];
                 }
             }
