@@ -40,7 +40,7 @@ class Solution {
                     continue;
                 }
 
-                int[][] nextBoard = generateNextBoard(board, current, nextBlankLocation);
+                int[][] nextBoard = generateNextBoard(current, nextBlankLocation);
                 queue.offer(new Element(nextBoard, nextBlankLocation, nextDepth));
             }
         }
@@ -48,7 +48,7 @@ class Solution {
         return -1;
     }
 
-    private static int[][] generateNextBoard(int[][] board, Element current, int[] nextBlankLocation) {
+    private static int[][] generateNextBoard(Element current, int[] nextBlankLocation) {
         int[][] nextBoard = Arrays.stream(current.board)
                 .map(int[]::clone)
                 .toArray(int[][]::new);
