@@ -1,19 +1,22 @@
 class Solution {
     public int maxCount(int[] banned, int n, int maxSum) {
-        Set<Integer> bannedNumbers = Arrays.stream(banned)
-            .boxed()
-            .collect(Collectors.toSet());
+        boolean[] isBanned = new boolean[n + 1];
+        for (int i = 0; i < banned.length; i++) {
+            int bannedNumber = banned[i];
+            if (bannedNumber <= n) {
+                isBanned[bannedNumber] = true;
+            }
+        }
 
         int count = 0;
-        int sum = 0;
 
         for (int number = 1; number <= n; number++) {    
-            if (bannedNumbers.contains(number)) {
-                continue;
-            }
-
             if (number > maxSum) {
                 break;
+            }
+            
+            if (isBanned[number]) {
+                continue;
             }
 
             count++;
