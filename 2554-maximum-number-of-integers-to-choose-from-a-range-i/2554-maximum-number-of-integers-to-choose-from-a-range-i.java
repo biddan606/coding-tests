@@ -8,12 +8,12 @@ class Solution {
         int sum = 0;
 
         for (int number = 1; number <= n; number++) {
-            if (bannedNumbers.contains(number)) {
-                continue;
-            }
-            
             if (sum + number > maxSum) {
                 break;
+            }
+            
+            if (bannedNumbers.contains(number)) {
+                continue;
             }
 
             count++;
