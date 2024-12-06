@@ -7,13 +7,13 @@ class Solution {
         int count = 0;
         int sum = 0;
 
-        for (int number = 1; number <= n; number++) {
-            if (number > maxSum) {
-                break;
-            }
-            
+        for (int number = 1; number <= n; number++) {    
             if (bannedNumbers.contains(number)) {
                 continue;
+            }
+
+            if (number > maxSum) {
+                break;
             }
 
             count++;
