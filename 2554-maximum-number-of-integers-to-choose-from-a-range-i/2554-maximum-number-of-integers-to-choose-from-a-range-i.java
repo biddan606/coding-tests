@@ -8,7 +8,7 @@ class Solution {
         int sum = 0;
 
         for (int number = 1; number <= n; number++) {
-            if (sum + number > maxSum) {
+            if (number > maxSum) {
                 break;
             }
             
@@ -17,7 +17,7 @@ class Solution {
             }
 
             count++;
-            sum += number;
+            maxSum -= number;
         }
         return count;
     }
