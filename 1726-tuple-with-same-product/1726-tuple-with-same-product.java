@@ -1,18 +1,16 @@
 class Solution {
     public int tupleSameProduct(int[] nums) {
-        Map<Integer, List<Pair<Integer, Integer>>> byProduct = new HashMap<>();
+        Map<Integer, Integer> countsByProduct = new HashMap<>();
         for (int i = 0; i < nums.length; i++) {
             for (int j = i + 1; j < nums.length; j++) {
                 int product = nums[i] * nums[j];
-                byProduct.computeIfAbsent(product, k -> new ArrayList<>())
-                    .add(new Pair(i, j));
+                countsByProduct.put(product, countsByProduct.getOrDefault(product, 0) + 1);
             }
         }
 
         int result = 0;
-        for (int key : byProduct.keySet()) {
-            int valuesSize = byProduct.get(key).size();
-            result += valuesSize * (valuesSize - 1) * 4;
+        for (int count : countsByProduct.values()) {
+            result += count * (count - 1) * 4;
         }
 
         return result;
