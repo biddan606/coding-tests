@@ -8,7 +8,9 @@ class Solution {
                 differences++;
             }
         }
-        if (differences > 2) {
+        if (differences == 0) {
+            return true;
+        } else if (differences > 2) {
             return false;
         }
 
