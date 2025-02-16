@@ -14,19 +14,24 @@ class Solution {
     }
 
     private static boolean canConvertToTarget(int source, int target) {
-        String sourceString = String.valueOf(source);
-        return matchBacktracking(sourceString, 0, 0, target);
+        return matchBacktracking(source, target);
     }
 
-    private static boolean matchBacktracking(String source, int startIndex, int sum, int target) {
-        if (startIndex == source.length()) {
-            return sum == target;
+    private static boolean matchBacktracking(int source, int target) {
+        if (target == 0 && source == 0) {
+            return true;
         }
+        
+        int splited = 0;
 
-        for (int chunk = 1; startIndex + chunk <= source.length(); chunk++) {
-            int chunkedNumber = Integer.parseInt(source.substring(startIndex, startIndex + chunk));
-
-            if (matchBacktracking(source, startIndex + chunk, sum + chunkedNumber, target)) {
+        for (int e = 0; source > 0; e++) {
+            splited = (source % 10) * (int) Math.pow(10, e) + splited;
+            source /= 10;
+            int nextTarget = target - splited;
+            
+            if (nextTarget < 0) {
+                return false;
+            } else if (matchBacktracking(source, nextTarget)) {
                 return true;
             }
         }
