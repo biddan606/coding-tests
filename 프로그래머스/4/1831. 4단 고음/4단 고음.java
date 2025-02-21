@@ -48,7 +48,7 @@ class Solution {
         int asteriskCount = (int) (Math.log10(n) / Math.log10(3));
         int plusCount = asteriskCount * 2;
         
-        backtrack(n, asteriskCount, plusCount);
+        backtrack(n - 2, asteriskCount, plusCount - 2);
         return matchedCount;
     }
     
