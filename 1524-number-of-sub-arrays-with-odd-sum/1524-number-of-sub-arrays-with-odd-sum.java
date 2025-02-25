@@ -33,7 +33,7 @@ class Solution {
         int evenSums = 0;
 
         for (int num : arr) {
-            if (num % 2 == 1) { // num == odd
+            if ((num & 1) == 1) { // num == odd
                 int prevOddSums = oddSums;
                 oddSums = evenSums + 1;
                 evenSums = prevOddSums;
