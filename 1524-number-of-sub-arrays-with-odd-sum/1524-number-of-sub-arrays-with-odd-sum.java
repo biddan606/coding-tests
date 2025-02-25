@@ -28,7 +28,7 @@ class Solution {
     private static final int MODULUS = 1_000_000_007;
 
     public int numOfSubarrays(int[] arr) {
-        int totalOddSums = 0;
+        long totalOddSums = 0;
         int oddSums = 0;
         int evenSums = 0;
 
@@ -41,9 +41,9 @@ class Solution {
                 evenSums += 1;
             }
 
-            totalOddSums = (totalOddSums + oddSums) % MODULUS;
+            totalOddSums += oddSums;
         }
 
-        return totalOddSums;
+        return (int)(totalOddSums % MODULUS);
     }
 }
