@@ -19,27 +19,26 @@ class Solution {
     4-1. 음수 합이 양수가 되면 초기화한다
     4-2. 양수 합이 음수가 되면 초기화한다
     5. 최대 절대 합을 반환한다
+
+    # 최적화
+    sub-array[i+k]+[i+k-1]... - (sub-array[j+l]+[j+l-1]...)
+    이 형태이다
+    `최대값 - 최소값`거나 `최소값 - 최대값`을 빼는 형태가 된다
+
+    다만, 첫 상태는 항상 0이다 왜냐하면 0도 유효한 상태이기 때문이다
     */
     public int maxAbsoluteSum(int[] nums) {
-        int maxAbsoluteSum = 0;
-        int negativeSum = 0;
-        int positiveSum = 0;
+        int prefixSum = 0;
+        int maxSum = 0;
+        int minSum = 0;
 
         for (int num : nums) {
-            negativeSum += num;
-            positiveSum += num;
+            prefixSum += num;
 
-            maxAbsoluteSum = Math.max(maxAbsoluteSum, Math.abs(negativeSum));
-            maxAbsoluteSum = Math.max(maxAbsoluteSum, positiveSum);
-
-            if (negativeSum > 0) {
-                negativeSum = 0;
-            }
-            if (positiveSum < 0) {
-                positiveSum = 0;
-            }
+            maxSum = Math.max(maxSum, prefixSum);
+            minSum = Math.min(minSum, prefixSum);
         }
 
-        return maxAbsoluteSum;
+        return maxSum - minSum;
     }
 }
