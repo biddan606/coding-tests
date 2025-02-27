@@ -21,37 +21,43 @@ class Solution {
     4. maxCount를 반환한다
 
     - 매번 arr를 돌며 피보나치 수를 찾는 것은 비효율적이므로 Set으로 저장해둔다
+
+    # 최적화
+    이미 살펴본 조합을 다시 살펴볼 필요는 없다
+    작은 수부터 살펴보기 때문에 항상 이전에 살펴본 경우가 더 클 것이다
     */
     public int lenLongestFibSubseq(int[] arr) {
         int size = arr.length;
         
-        Set<Integer> numbers = new HashSet<>();
+        Map<Integer, Integer> valuesByIndex = new HashMap<>();
         
-        for (int num : arr) {
-            numbers.add(num);
+        for (int i = 0; i < size; i++) {
+            valuesByIndex.put(arr[i], i);
         }
 
         int maxCount = 0;
+        int[][] dp = new int[size][size];
 
-        for (int i = 0; i < size; i++) {
-            for (int j = i + 1; j < size; j++) {
-                int first = arr[i];
-                int second = arr[j];
-                int currentCount = 2;
+        for (int secondIndex = 0; secondIndex < size; secondIndex++) {
+            int second = arr[secondIndex];
 
-                while (numbers.contains(first + second)) {
-                    int nextSecond = first + second;
-                    first = second;
-                    second = nextSecond;
-                    currentCount++;   
-                }
+            for (int fibonacciIndex = secondIndex + 1; fibonacciIndex < size; fibonacciIndex++) {
+                int first = arr[fibonacciIndex] - second;
 
-                if (currentCount > 2) {
-                    maxCount = Math.max(maxCount, currentCount);
+                dp[secondIndex][fibonacciIndex] = 2; // 기본값
+                Integer firstIndex = valuesByIndex.get(first);
+                if (firstIndex != null && first < second) {
+                    dp[secondIndex][fibonacciIndex] = dp[firstIndex][secondIndex] + 1;
                 }
             }
         }
 
-        return maxCount;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                maxCount = Math.max(maxCount, dp[i][j]);
+            }
+        }
+
+        return maxCount == 2 ? 0 : maxCount;
     }
 }
