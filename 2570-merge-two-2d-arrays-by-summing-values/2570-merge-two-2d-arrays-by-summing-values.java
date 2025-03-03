@@ -2,30 +2,54 @@ import java.util.*;
 
 class Solution {
     public int[][] mergeArrays(int[][] nums1, int[][] nums2) {
-        SortedMap<Integer, Integer> sortedMap = new TreeMap<>();
+        List<int[]> list = new ArrayList<>();
+
+        int nums1Index = 0;
+        int nums2Index = 0;
+        while (nums1Index < nums1.length && nums2Index < nums2.length) {
+            int nums1Id = nums1[nums1Index][0];
+            int nums1Value = nums1[nums1Index][1];
+            int nums2Id = nums2[nums2Index][0];
+            int nums2Value = nums2[nums2Index][1];
+
+            if (nums1Id == nums2Id) {
+                list.add(new int[]{nums1Id, nums1Value + nums2Value});
+                
+                nums1Index++;
+                nums2Index++;
+            } else if (nums1Id < nums2Id) {
+                list.add(new int[]{nums1Id, nums1Value});
+                
+                nums1Index++;
+            } else { // nums1Id > nums2Id
+                list.add(new int[]{nums2Id, nums2Value});
+                
+                nums2Index++;
+            }
+        }
+
+        while (nums1Index < nums1.length) {
+            int nums1Id = nums1[nums1Index][0];
+            int nums1Value = nums1[nums1Index][1];
+
+            list.add(new int[]{nums1Id, nums1Value});
+                
+            nums1Index++;
+        }
         
-        for (int[] entry : nums1) {
-            int id = entry[0];
-            int value = entry[1];
+        while (nums2Index < nums2.length) {
+            int nums2Id = nums2[nums2Index][0];
+            int nums2Value = nums2[nums2Index][1];
 
-            sortedMap.put(id, sortedMap.getOrDefault(id, 0) + value);
+            list.add(new int[]{nums2Id, nums2Value});
+                
+            nums2Index++;
         }
 
-        for (int[] entry : nums2) {
-            int id = entry[0];
-            int value = entry[1];
-
-            sortedMap.put(id, sortedMap.getOrDefault(id, 0) + value);
-        }
-
-        int[][] result = new int[sortedMap.size()][2];
-        int resultIndex = 0;
-
-        for (Map.Entry<Integer, Integer> entry : sortedMap.entrySet()) {
-            result[resultIndex][0] = entry.getKey();
-            result[resultIndex][1] = entry.getValue();
-            
-            resultIndex++;
+        int[][] result = new int[list.size()][2];
+        
+        for (int i = 0; i < result.length; i++) {
+            result[i] = list.get(i);
         }
 
         return result;
