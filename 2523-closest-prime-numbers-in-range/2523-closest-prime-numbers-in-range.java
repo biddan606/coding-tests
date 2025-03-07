@@ -45,14 +45,16 @@ class Solution {
 
         // 가장 가까운 소수쌍을 찾는다
         int[] result = {-1, -1};
+        int minDiff = right - left + 1;
 
         for (int i = 0; i + 1 < primesInRange.size(); i++) {
             int currentMinPrime = primesInRange.get(i);
             int currentMaxPrime = primesInRange.get(i + 1);
             int currentDiff =  currentMaxPrime - currentMinPrime;
-            int minDiff = result[1] - result[0];
+            
             if (result[0] == -1 || minDiff > currentDiff) {
                 result = new int[]{currentMinPrime, currentMaxPrime};
+                minDiff = currentDiff;
             }
         }
 
