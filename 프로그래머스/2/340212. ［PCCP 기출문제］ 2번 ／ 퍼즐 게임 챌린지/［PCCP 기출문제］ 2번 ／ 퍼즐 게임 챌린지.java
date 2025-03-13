@@ -50,6 +50,6 @@ class Solution {
             }
         }
         
-        return maxLevel;
+        return minLevel;
     }
 }
