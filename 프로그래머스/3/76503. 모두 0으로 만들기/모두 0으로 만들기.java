@@ -27,7 +27,7 @@ class Solution {
     dfs 깊이가 깊어져 에러가 발생하는 것을 추정
     a의 길이가 최대 300_000이니 dfs 깊이가 300_000까지 갈 수 있음
     
-    dfs -> bfs로 변경
+    dfs -> iterativeDfs로 변경
     */
     public long solution(int[] a, int[][] edges) {
         // 가중치를 0으로 만들 수 있는지 검사
