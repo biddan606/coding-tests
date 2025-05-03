@@ -36,6 +36,16 @@ class Solution {
         6. top위치횟수, bottom위치횟수를 모두 구함
             - 겹칠 수 있어서 1개만 구할 수 없음
         7. min(size - top위치횟수, size - bottom위치횟수)을 반환한다
+    
+    ---
+    
+    # 다른 풀이
+    tops[0], bottoms[0]이 targetNumber가 된다
+    -> targetNumber는 모든 도미노에 1개는 존재해야 하므로
+
+    tops[0], bottoms[0]로 counting과 함께 positionCount를 구하면서
+    결과가 존재한다면 반환해도 된다
+    -> 결과가 존재한다는 의미는 해당 수가 targetNumber라는 것
     */
     public int minDominoRotations(int[] tops, int[] bottoms) {
         int size = tops.length;
