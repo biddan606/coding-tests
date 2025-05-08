@@ -16,6 +16,13 @@ class Solution {
     3. 큐에서 원소를 빼서 4방향을 돌며, 다음 포인트로 이동한다
         - max(원소 도착 시간, (r, c) 최소 도착) + a
     4. (maxRow, maxCol) 최소 도착 시간을 반환한다
+
+    ---
+
+    이동하는 데에 걸리는 시간을 저장해둘 필요가 없다
+    (r, c)에 따라 해당 위치로 이동에 필요한 시간은 픽스되어 있다
+    (r + c) % 2 == 1, 1 (r + c) % 2 == 0, 2 이다
+    이건 돌아서 오더라도 동일하다 계속 뒤집듯이 변경되어 해당 이동 필요 시간(1 또는 2)이 된다
     */
     private static final int[][] DIRECTIONS = {
         {-1, 0},
@@ -28,13 +35,8 @@ class Solution {
         int rows = moveTime.length;
         int cols = moveTime[0].length;
 
-        PriorityQueue<Element> pq = new PriorityQueue<>((e1, e2) -> {
-            if (e1.arriveTime == e2.arriveTime) {
-                return e1.moveTime - e2.moveTime;
-            }
-            return e1.arriveTime - e2.arriveTime;
-        });
-        pq.offer(new Element(0, 0, 0, 1));
+        PriorityQueue<Element> pq = new PriorityQueue<>((e1, e2) -> e1.arriveTime - e2.arriveTime);
+        pq.offer(new Element(0, 0, 0));
 
         boolean[][] visited = new boolean[rows][cols];
         int targetArrivalTime = -1;
@@ -50,10 +52,10 @@ class Solution {
                     continue;
                 }
 
-                int nextArrivalTime = Math.max(e.arriveTime, moveTime[nextRow][nextCol]) + e.moveTime;
-                int nextMoveTime = e.moveTime == 1 ? 2 : 1;
+                int moveRequiredTime = 2 - ((nextRow + nextCol) & 1);
+                int nextArrivalTime = Math.max(e.arriveTime, moveTime[nextRow][nextCol]) + moveRequiredTime;
 
-                pq.offer(new Element(nextRow, nextCol, nextArrivalTime, nextMoveTime));
+                pq.offer(new Element(nextRow, nextCol, nextArrivalTime));
                 visited[nextRow][nextCol] = true;
                 if (nextRow == rows - 1 && nextCol == cols - 1) {
                     targetArrivalTime = nextArrivalTime;
@@ -68,13 +70,11 @@ class Solution {
         final int row;
         final int col;
         final int arriveTime;
-        final int moveTime;
 
-        public Element(int row, int col, int arriveTime, int moveTime) {
+        public Element(int row, int col, int arriveTime) {
             this.row = row;
             this.col = col;
             this.arriveTime = arriveTime;
-            this.moveTime = moveTime;
         }
     }
 }
