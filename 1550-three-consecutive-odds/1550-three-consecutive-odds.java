@@ -1,18 +1,18 @@
 class Solution {
     public boolean threeConsecutiveOdds(int[] arr) {
-        int consecutive = 0;
-        
-        for (int number : arr) {
-            if (number % 2 == 1) {
-                consecutive++;
-                if (consecutive >= 3) {
-                    return true;
-                }
+        int oddConsecutiveCount = 0;
+
+        for (int num : arr) {
+            if (num % 2 == 1) {
+                oddConsecutiveCount++;
             } else {
-                consecutive = 0;
+                oddConsecutiveCount = 0;
+            }
+
+            if (oddConsecutiveCount == 3) {
+                return true;
             }
         }
-
         return false;
     }
 }
