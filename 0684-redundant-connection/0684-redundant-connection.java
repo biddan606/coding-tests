@@ -47,7 +47,6 @@ class Solution {
         int parentOfIndex1 = parent(parents, index1);
         int parentOfIndex2 = parent(parents, index2);
         
-        parents[parentOfIndex1] = Math.max(parentOfIndex1, parentOfIndex2);
-        parents[parentOfIndex2] = Math.max(parentOfIndex1, parentOfIndex2);
+        parents[Math.max(parentOfIndex1, parentOfIndex2)] = Math.min(parentOfIndex1, parentOfIndex2);
     }
 }
