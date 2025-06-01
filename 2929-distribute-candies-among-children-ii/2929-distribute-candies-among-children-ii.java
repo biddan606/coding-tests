@@ -52,7 +52,8 @@ class Solution {
     이를 더해주어야 합니다
 
     마찬가지로 세 아이가 모두 초과했을 수도 있습니다
-    이 경우의 수를 고려해서 다시 빼줍니다(두번째에서 이 경우의 수가 많이 더해짐)
+    이 경우의 수를 고려해서 다시 빼줍니다
+    -> 두 아이 초과를 계산하면서 세 아이 초과가 빠짐
     */
     public long distributeCandies(int n, int limit) {
         return combinations(n + 2)
