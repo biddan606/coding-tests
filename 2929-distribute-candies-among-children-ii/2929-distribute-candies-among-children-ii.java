@@ -1,0 +1,50 @@
+class Solution {
+    /*
+    # 문제 이해 
+    n개의 사탕을 나누어, 3명의 아이들에게 준다
+    아이들은 limit를 넘지 않는 사탕을 가지고 있어야 한다
+    이를 만족하는 경우의 수는 총 몇개일까?
+
+    # 풀이 접근
+    가장 간단한 풀이는 모든 경우의 수를 세는거다
+
+    n의 최대 개수는 10^6이고 limit도 10^6이다
+    3명의 아이니까 최대 모든 경우의 n * n = 10 ^ 12가 될 수 있다
+    -> 모든 경우의 수를 구하면 시간 초과가 발생한다
+    
+    모든 경우의 수를 구해야 할까?
+    그럴 필요 없을 것 같다. 패턴이 존재해보인다
+    
+    n = 6, limit = 3이라 하면
+    처음은 (3, 3, 0)으로 시작한다 그리고 첫자리가 3인 경우의 수는 (3, 0, 3)까지 이어진다
+    총 4가지이다
+    첫자리가 2인 경우는 (2, 3, 1)부터 시작하여 (2, 1, 3) 총 3가지이다
+    첫자리가 1인 경우는 (1, 3, 2) -> (1, 2, 3) 총 2가지이다
+    첫자리가 0인 경우는 (0, 3, 3) -> (0, 3, 3) 총 1가지이다
+    첫자리만 고정된 상태에서 나머지를 구하면 된다
+    
+    # 구현 스텝
+    1. 모든 첫자리 수의 경우의 수를 돈다
+    2. 각 첫자리수별로 가능한 경우의 수를 카운트하여 전체 경우의 수에 더한다
+    2. 전체 경우의 수를 반환한다
+
+    * 경우의 수는 long 값이 될 수 있다 변환 주의!
+    */
+    public long distributeCandies(int n, int limit) {
+        long totalCases = 0;
+
+        for (int firstValue = 0; firstValue <= Math.min(n, limit); firstValue++) {
+            int remaininingValue = n - firstValue;
+            int secondValue = Math.min(limit, remaininingValue);
+            int thirdValue = remaininingValue - secondValue;
+            if (thirdValue > limit) {
+                continue;
+            }
+
+            int currentCases = Math.min(secondValue + 1, limit - thirdValue + 1);
+            totalCases += currentCases;
+        }
+
+        return totalCases;
+    }
+}
