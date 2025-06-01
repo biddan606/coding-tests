@@ -29,22 +29,42 @@ class Solution {
     2. 전체 경우의 수를 반환한다
 
     * 경우의 수는 long 값이 될 수 있다 변환 주의!
+
+    ---
+
+    # 다른 풀이
+    포함에서 배제를 빼는 방식
+    포함: 모든 경우의 수
+    배제: limit 제약을 벗어나는 경우의 수
+
+    모든 경우의 수는 각 아이를 막대기, 사탕을 사탕으로 본다면
+    막대기와 사탕 = 2 + n개 있는 것이다
+    이 막대기를 움직여 각 아이에게 사탕을 분배할 수 있다
+    -> 모든 경우의 수: (n + 2) * (n + 1) / 2
+
+    여기서 초과한 경우의 수를 빼주어야 합니다
+    한 아이에게 limit + 1개를 분배한 경우의 수를 빼줍니다
+
+    한 아이에게 limit + 1개를 분배한 경우의 수를 빼줄 때
+    두 아이가 초과한 경우를 여러번 빼줍니다
+    첫번째 아이가 초과한 경우 -> 첫번째 아이와 두번째 아이가 초과한 경우
+    두번째 아이가 초과한 경우 -> 두번쨰 아이와 첫번째 아이가 초과한 경우
+    이를 더해주어야 합니다
+
+    마찬가지로 세 아이가 모두 초과했을 수도 있습니다
+    이 경우의 수를 고려해서 다시 빼줍니다(두번째에서 이 경우의 수가 많이 더해짐)
     */
     public long distributeCandies(int n, int limit) {
-        long totalCases = 0;
+        return combinations(n + 2)
+            - 3 * combinations(n + 2 - (limit + 1))
+            + 3 * combinations(n + 2 - 2 * (limit + 1))
+            - combinations(n + 2 - 3 * (limit + 1));
+    }
 
-        for (int firstValue = 0; firstValue <= Math.min(n, limit); firstValue++) {
-            int remaininingValue = n - firstValue;
-            int secondValue = Math.min(limit, remaininingValue);
-            int thirdValue = remaininingValue - secondValue;
-            if (thirdValue > limit) {
-                continue;
-            }
-
-            int currentCases = Math.min(secondValue + 1, limit - thirdValue + 1);
-            totalCases += currentCases;
+    private static long combinations(long k) {
+        if (k < 1) {
+            return 0L;
         }
-
-        return totalCases;
+        return (k - 1) * k / 2;
     }
 }
