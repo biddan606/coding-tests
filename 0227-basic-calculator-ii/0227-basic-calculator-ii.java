@@ -28,73 +28,83 @@ class Solution {
         operator, number 순회하며 (2-1, 2-2) 수행
     3. 남은 연산 수행
     4. number peek 반환
+
+    ---
+
+    공간 복잡도를 O(1)로 풀 수 있다
+
+    "22 - 3 * 5"라고 할 때,
+    '-'가 오는 경우 22는 계산되어도 된다 -> 22는 그 다음 계산부터 무관하므로
+    22가 계산될 수 있게 "0 + 22 - 3 * 5"라고 표현하면 된다
+
+    '*'가 오면 미뤄야 한다
+    "22 * 3 - 5"라고 할 때,
+    '-' 지점에 도달해서 '*'를 계산해도 '-'와 무관하지 않기 때문이다
+    '-'와 계산되는 leftNumber가 만들어진다
+
+    이 성질을 이용해서 공간 복잡도 O(1)로 풀 수 있다
+
+    맨 앞에 "0 + " 가 있다 생각하여
+    operator = '+'
+    lastNumber = 0 로 시작한다
+
+    currentNumber로 숫자를 생성하며
+    '+', '-'가 오면 lastNumber를 결과에 추가하고
+
+    '*', '/'가 오면 lastNumber를 갱신한 뒤, 미룬다
+
     */
     public int calculate(String s) {
-        // number 분리
-        int[] numbers = Arrays.stream(s.split("[+\\-*/]"))
-                            .map(String::trim)
-                            .mapToInt(Integer::parseInt)
-                            .toArray();
+        int lastNumber = 0;
+        char operator = '+';
+        int currentNumber = 0;
+        int result = 0;
 
-        // operator 분리
-        Character[] operators = Arrays.stream(s.split("[\\d]"))
-                            .map(String::trim)
-                            .filter(str -> !str.isEmpty())
-                            .map(str -> str.charAt(0))
-                            .toArray(Character[]::new);
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
 
-        Deque<Integer> numberStack = new ArrayDeque<>();
-        Deque<Character> operatorStack = new ArrayDeque<>();
-
-        numberStack.push(numbers[0]);
-
-        for (int i = 1; i < numbers.length; i++) {
-            int currentNumber = numbers[i];
-            char currentOperator = operators[i - 1];
-
-            while (!operatorStack.isEmpty() 
-                && isGrePriority(operatorStack.peek(), currentOperator)) {
+            if (Character.isDigit(c)) {
+                currentNumber = currentNumber * 10 + c - '0';
+            } 
+            
+            if (isOperator(c) || i == s.length() - 1) {
+                switch (operator) {
+                    case '+':
+                    result += lastNumber;
+                    lastNumber = currentNumber;
+                    break;
                 
-                calculate(numberStack, operatorStack.pop());
+                case '-':
+                    result += lastNumber;
+                    lastNumber = -currentNumber;
+                    break;
+
+                case '*':
+                    lastNumber *= currentNumber;
+                    break;
+
+                case '/':
+                    lastNumber /= currentNumber;
+                    break;
+
+                default:
+                    break;
+                }
+
+                operator = c;
+                currentNumber = 0;
             }
-
-            numberStack.push(currentNumber);
-            operatorStack.push(currentOperator);
         }
 
-        while (!operatorStack.isEmpty()) {
-            calculate(numberStack, operatorStack.pop());
-        }
+        result += lastNumber;
 
-        return numberStack.peek();
+        return result;
     }
 
-    private static boolean isGrePriority(char operator1, char operator2) {
-        return !((operator1 == '+' || operator1 == '-')
-            && (operator2 == '*' || operator2 == '/'));
-    }
-
-    private static void calculate(Deque<Integer> numberStack, char operator) {
-        int rightNumber = numberStack.pop();
-        int leftNumber = numberStack.pop();
-
-        int result = calulate(leftNumber, rightNumber, operator);
-
-        numberStack.push(result);
-    }
-
-    private static int calulate(int leftNumber, int rightNumber, char operator) {
-        switch (operator) {
-            case '+': 
-                return leftNumber + rightNumber;
-            case '-':
-                return leftNumber - rightNumber;
-            case '*':
-                return leftNumber * rightNumber;
-            case '/':
-                return leftNumber / rightNumber;
-            default:
-                throw new IllegalArgumentException("잘못된 연산자");
-        }
+    private static boolean isOperator(char c) {
+        return c == '+' 
+            || c == '-'
+            || c == '*'
+            || c == '/';
     }
 }
