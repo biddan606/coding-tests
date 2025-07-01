@@ -39,10 +39,7 @@
 
 */
 function solution(n, w, num) {
-    let boxes = [];
-    for (let i = 0; i < w; i++) {
-        boxes.push([]);
-    }
+    let boxes = Array.from({length: w}, () => []);
     
     for (let b = 1; b <= n; b++) {
         let row = (b - 1) % w;
