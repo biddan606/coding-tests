@@ -37,28 +37,36 @@
     row = 꺼낼 번지, col = level
 2. row의 총 길이 - col을 반환한다(꺼내야 하는 상자의 개수)
 
+---
+
+boxes라는 배열에 층을 채우지 않고 계산할 수 있다.
+
+1. num의 위치와 층을 구한다
+2. num의 위치에 몇개의 상자가 쌓였는지 확인한다
+3. num의 위치의 총 상자 개수 - num의 위치를 반환한다
 */
 function solution(n, w, num) {
-    let boxes = Array.from({length: w}, () => []);
+    // num 위치와 층을 구한다
+    const level = Math.floor((num - 1) / w);
+    const offset = (num - 1) % w;
+    const col = level % 2 === 0 
+                ? offset
+                : w - 1 - offset;
     
-    for (let b = 1; b <= n; b++) {
-        let row = (b - 1) % w;
-        if (((b - 1) / w) & 1 == 1) {
-            row = (w - 1) - row;
+    // num의 위치에 몇개의 상자가 쌓였는지 확인한다
+    let fullLelvel = Math.floor(n / w);
+    const rest = n % w;
+    let extra = 0;
+    
+    if (rest !== 0) {
+        if (fullLelvel % 2 === 0) {
+            extra += rest > col ? 1 : 0;
+        } else {
+            extra += w - rest <= col ? 1 : 0; 
         }
-        
-        boxes[row].push(b);
     }
     
-    let numRow = -1;
-    let numCol = -1;
-    for (let row = 0; row < w; row++) {
-        numCol = boxes[row].findIndex(n => n == num);
-        if (numCol !== -1) {
-            numRow = row;
-            break;
-        }
-    }
+    const totalBoxesAtCol = fullLelvel + extra;
     
-    return boxes[numRow].length - numCol;
+    return totalBoxesAtCol - level;
 }
