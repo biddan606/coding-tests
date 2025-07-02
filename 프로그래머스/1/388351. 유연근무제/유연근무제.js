@@ -25,29 +25,21 @@ startday은 토요일, 일요일을 고려할 때 사용
 function solution(schedules, timelogs, startday) {
     const elementCount = schedules.length;
     
-    const check = [];
+    const check = Array(elementCount).fill(true);
     
-    for (let i = 0; i < elementCount; i++) {
-        check.push(true);
-    }
-    
-    const limitTimes = [];
-    
-    for (let i = 0; i < elementCount; i++) {
-        let time = schedules[i];
+    const limitTimes = schedules.map(s => {
+        let time = s;
         time += 10;
         
         const carry = Math.floor((time % 100) / 60);
         time -= carry === 1 ? 60 : 0;
         
-        const limitTime = time + carry * 100;
-        
-        limitTimes.push(limitTime);
-    }
+        return time + carry * 100;
+    });
     
     for (let d = 0; d < 7; d++) {
-        if (startday === 6 || startday === 7) {
-            startday = (startday % 7) + 1;
+        const today = ((startday + d - 1) % 7) + 1;
+        if (today === 6 || today === 7) {
             continue;
         }
         
@@ -58,8 +50,6 @@ function solution(schedules, timelogs, startday) {
                 check[i] = false;
             }
         }
-        
-        startday = (startday % 7) + 1;
     }
     
     return check.filter(t => t === true).length;
