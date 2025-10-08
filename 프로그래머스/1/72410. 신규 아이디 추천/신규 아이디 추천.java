@@ -1,55 +1,32 @@
 class Solution {
-
-    public String solution(String id) {
-        // 소문자로 치환
-        id = id.toLowerCase();
-
-        // 알파벳 소문자, 숫자, 빼기, 밑줄, 마침표를 제외한 문자 제거
-        id = id.replaceAll("[^\\w\\d-_.]", "");
-
-        // 마침표가 2번 이상 연속된다면 하나의 마침표로 치환
-        id = id.replaceAll("\\.{2,}", ".");
+    /*
+    아이디 규칙에 맞지 않는 아이디를 입력했을 때, 규칙에 맞는 유사한 아이디를 추천해야 한다.
+    */
+    public String solution(String new_id) {
+        String changedId1 = new_id.toLowerCase();
         
-        // id의 양 끝이 마침표로 끝난다면 제거
-        if (id.startsWith(".")) {
-            id = id.substring(1);
-        }
-        if (id.endsWith(".")) {
-            id = id.substring(0, id.length() - 1);
+        String changedId2 = changedId1.replaceAll("[^a-z0-9\\-_.]", "");
+        
+        String changedId3 = changedId2.replaceAll("\\.+", ".");
+        
+        String changedId4 = changedId3.replaceAll("^\\.|\\.$", "");
+        
+        String changedId5 = changedId4;
+        if (changedId5.isEmpty()) {
+            changedId5 = "a";
         }
         
-        // 빈 문자열이라면 "a"를 대입
-        if (id.isEmpty()) {
-            id = "a";
+        String changedId6 = changedId5;
+        if (changedId6.length() >= 16) {
+            changedId6 = changedId6.substring(0, 15);
+            changedId6 = changedId6.replaceAll("\\.$", "");
         }
         
-        // id 길이가 16자 이상이면, 첫 15개의 문자를 제외한 문자 모두 제거
-        if (id.length() >= 16) {
-            id = id.substring(0, 15);
-            // id의 양 끝이 마침표로 끝난다면 제거
-            if (id.startsWith(".")) {
-                id = id.substring(1);
-            }
-            if (id.endsWith(".")) {
-                id = id.substring(0, id.length() - 1);
-            }
+        String changedId7 = changedId6;
+        while (changedId7.length() <= 2) {
+            changedId7 += changedId7.charAt(changedId7.length() - 1);
         }
-
-        // id 길이가 2자 이하라면, 이어 붙여서 3자로 만듦
-        if (id.length() <= 2) {
-            while (id.length() < 3) {
-                id += id.charAt(id.length() - 1);
-            }
-        }
-
-        return id;
-    }
-
-    public static void main(String[] args) {
-        Solution solution = new Solution();
-
-        String recommendedId = solution.solution("hello");
-
-        System.out.println(recommendedId);
+        
+        return changedId7;
     }
 }
