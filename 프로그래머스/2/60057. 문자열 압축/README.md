@@ -1,10 +1,10 @@
 # [level 2] 문자열 압축 - 60057 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/60057) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/60057?gad_source=1&gad_campaignid=22199869887&gbraid=0AAAAAC_c4nDRnLcdW5pfc_L8ay5k5GtDz&gclid=CjwKCAjwvO7CBhAqEiwA9q2YJbn8g3uU5ynefiaRrs65vrzEvwxuWyBu9ikUQDfmOJJ79-3OPMuXsBoCgF0QAvD_BwE) 
 
 ### 성능 요약
 
-메모리: 77.9 MB, 시간: 0.12 ms
+메모리: 89.3 MB, 시간: 3.31 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2023년 12월 1일 6:7:8
+2025년 10월 10일 03:04:54
 
 ### 문제 설명
 
@@ -93,6 +93,8 @@
 이 경우 어떻게 문자열을 잘라도 압축되지 않으므로 가장 짧은 길이는 17이 됩니다. </p>
 
 <hr>
+
+<p>※ 공지 - 2024년 7월 8일 테스트케이스가 추가되었습니다. 기존에 제출한 코드가 통과하지 못할 수도 있습니다.</p>
 
 
 > 출처: 프로그래머스 코딩 테스트 연습, https://school.programmers.co.kr/learn/challenges
