@@ -27,28 +27,44 @@ class Solution {
         }
         
         int totalLength = 0;
-        String currentChunk = chunks.get(0);
-        int repeatCount = 1;
-        
+        CompressedChunk currentChunk = new CompressedChunk(chunks.get(0));
+
         for (int i = 1; i < chunks.size(); i++) {
-            if (currentChunk.equals(chunks.get(i))) {
-                repeatCount++;
+            if (currentChunk.matches(chunks.get(i))) {
+                currentChunk.incrementCount();
             } else {
-                totalLength += getCompressedChunkLength(currentChunk, repeatCount);
-                currentChunk = chunks.get(i);
-                repeatCount = 1;
+                totalLength += currentChunk.getCompressedLength();
+                currentChunk = new CompressedChunk(chunks.get(i));
             }
         }
-        
-        totalLength += getCompressedChunkLength(currentChunk, repeatCount);
+
+        totalLength += currentChunk.getCompressedLength();
         return totalLength;
     }
     
-    private int getCompressedChunkLength(String chunk, int repeatCount) {
-        int length = chunk.length();
-        if (repeatCount > 1) {
-            length += String.valueOf(repeatCount).length();
+    private static class CompressedChunk {
+        private final String value;
+        private int count;
+
+        public CompressedChunk(String value) {
+            this.value = value;
+            this.count = 1;
         }
-        return length;
+
+        public boolean matches(String other) {
+            return this.value.equals(other);
+        }
+
+        public void incrementCount() {
+            this.count++;
+        }
+
+        public int getCompressedLength() {
+            int length = value.length();
+            if (count > 1) {
+                length += String.valueOf(count).length();
+            }
+            return length;
+        }
     }
 }
