@@ -20,7 +20,7 @@ public class Main {
             numbers[i] = Long.parseLong(br.readLine());
         }
 
-        Sum totalSum = createSums(numbers);
+        SegmentTree segmentTree = new SegmentTree(numbers);
 
         int currentChangeCount = 0;
         int currentSumOperationCount = 0;
@@ -33,11 +33,11 @@ public class Main {
             long number2 = Long.parseLong(command[2]);
 
             if (operation == 1) {
-                totalSum.update(number1 - 1, number2);
+                segmentTree.update(number1, number2);
 
                 currentChangeCount++;
             } else {
-                long result = totalSum.query(number1 - 1, (int) (number2 - 1));
+                long result = segmentTree.query(number1, (int) number2);
                 System.out.println(result);
 
                 currentSumOperationCount++;
@@ -45,92 +45,74 @@ public class Main {
         }
     }
 
-    private static Sum createSums(long[] numbers) {
-        long[] cumulativeSums = new long[numbers.length + 1];
+    private static class SegmentTree {
+        private long[] tree;
+        private int size;
 
-        for (int i = 0; i < numbers.length; i++) {
-            cumulativeSums[i + 1] = cumulativeSums[i] + numbers[i];
+        public SegmentTree(long[] arr) {
+            this.size = arr.length;
+
+            this.tree = new long[size * 4];
+            if (size > 0) {
+                buildTree(arr, 1, 1, size);
+            }
         }
 
-        return buildSum(cumulativeSums, 0, numbers.length - 1);
-    }
+        private Long buildTree(long[] arr, int node, int startInclusive, int endInclusive) {
+            if (startInclusive == endInclusive) {
+                tree[node] = arr[startInclusive - 1];
+                return tree[node];
+            }
 
-    private static Sum buildSum(long[] cumulativeSums, int startIndexInclusive, int endIndexInclusive) {
-        Sum sum = new Sum(startIndexInclusive, endIndexInclusive,
-                cumulativeSums[endIndexInclusive + 1] - cumulativeSums[startIndexInclusive]);
+            int mid = startInclusive + (endInclusive - startInclusive) / 2;
 
-        if (startIndexInclusive == endIndexInclusive) {
-            return sum;
+            long leftSum = buildTree(arr, node * 2,  startInclusive, mid);
+            long rightSum = buildTree(arr, node * 2 + 1, mid + 1, endInclusive);
+
+            tree[node] = leftSum + rightSum;
+            return tree[node];
         }
 
-        int mid = startIndexInclusive + (endIndexInclusive - startIndexInclusive) / 2;
-
-        sum.left = buildSum(cumulativeSums, startIndexInclusive, mid);
-        sum.right = buildSum(cumulativeSums, mid + 1, endIndexInclusive);
-
-        return sum;
-    }
-
-    private static class Sum {
-        int startIndexInclusive;
-        int endIndexInclusive;
-        long value;
-        Sum left;
-        Sum right;
-
-        public Sum(int startIndexInclusive, int endIndexInclusive, long value) {
-            this.startIndexInclusive = startIndexInclusive;
-            this.endIndexInclusive = endIndexInclusive;
-            this.value = value;
+        public void update(int number, long value) {
+            updateNode(1, 1, size, number, value);
         }
 
-        public Long query(int targetStart, int targetEnd) {
-            // 1. 현재 노드 범위 [start, end]가 찾는 범위 [targetStart, targetEnd]와 전혀 겹치지 않는 경우
-            if (targetEnd < this.startIndexInclusive || this.endIndexInclusive < targetStart) {
-                return 0L;
+        private void updateNode(int node, int startInclusive, int endInclusive, int number, long value) {
+            if (number < startInclusive || endInclusive < number) {
+                return;
             }
 
-            // 2. 현재 노드 범위가 찾는 범위에 완전히 포함되는 경우
-            if (targetStart <= this.startIndexInclusive && this.endIndexInclusive <= targetEnd) {
-                return this.value;
+            if (startInclusive == endInclusive) {
+                tree[node] = value;
+                return;
             }
 
-            // 3. 그 외 (애매하게 걸쳐있는 경우), 왼쪽/오른쪽 자식에게 '원래 범위'를 그대로 물어본다.
-            int mid = this.startIndexInclusive + (this.endIndexInclusive - this.startIndexInclusive) / 2;
-            long leftSum = 0;
-            long rightSum = 0;
+            int mid =  startInclusive + (endInclusive - startInclusive) / 2;
 
-            // 왼쪽 자식에게 물어보기
-            if (this.left != null) {
-                leftSum = this.left.query(targetStart, targetEnd);
-            }
-            // 오른쪽 자식에게 물어보기
-            if (this.right != null) {
-                rightSum = this.right.query(targetStart, targetEnd);
-            }
+            updateNode(node * 2, startInclusive, mid, number, value);
+            updateNode(node * 2 + 1, mid + 1, endInclusive, number, value);
 
-            return leftSum + rightSum;
+            tree[node] = tree[node * 2] + tree[node * 2 + 1];
         }
 
-        public long update(int index, long changeValue) {
-            if (this.startIndexInclusive == index && this.endIndexInclusive == index) {
-                long prevValue =  this.value;
-                this.value = changeValue;
+        public long query(int startInclusive, int endInclusive) {
+            return queryRange(1, 1, size, startInclusive, endInclusive);
+        }
 
-                return prevValue;
+        private long queryRange(int node, int left, int right, int startInclusive, int endInclusive) {
+            if (endInclusive < left || right < startInclusive) {
+                return 0;
             }
 
-            int mid = this.startIndexInclusive + (this.endIndexInclusive - this.startIndexInclusive) / 2;
-            long prevValue;
-
-            if (index <= mid) {
-                prevValue = left.update(index, changeValue);
-            } else {
-                prevValue = right.update(index, changeValue);
+            if (startInclusive <= left && right <= endInclusive) {
+                return tree[node];
             }
 
-            this.value += changeValue - prevValue;
-            return prevValue;
+            int mid =  left + (right - left) / 2;
+
+            long leftSum = queryRange(node * 2, left, mid, startInclusive, endInclusive);
+            long rightSum = queryRange(node * 2 + 1, mid + 1, right, startInclusive, endInclusive);
+            return  leftSum + rightSum;
         }
     }
 }
