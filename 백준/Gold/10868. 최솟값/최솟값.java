@@ -8,87 +8,86 @@ import java.util.StringTokenizer;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(System.out));
 
-        StringTokenizer st = new StringTokenizer(br.readLine());
+        StringTokenizer stringTokenizer = new StringTokenizer(bufferedReader.readLine());
 
-        int n = Integer.parseInt(st.nextToken());
-        int m = Integer.parseInt(st.nextToken());
+        int arraySize = Integer.parseInt(stringTokenizer.nextToken());
+        int queryCount = Integer.parseInt(stringTokenizer.nextToken());
 
-        int[] arr = new int[n];
-        for (int i = 0; i < n; i++) {
-            st = new StringTokenizer(br.readLine());
-            arr[i] = Integer.parseInt(st.nextToken());
+        int[] numbers = new int[arraySize];
+        for (int i = 0; i < arraySize; i++) {
+            stringTokenizer = new StringTokenizer(bufferedReader.readLine());
+            numbers[i] = Integer.parseInt(stringTokenizer.nextToken());
         }
 
-        Rmq rmq = new Rmq(arr);
+        RangeMinimumQuery rangeMinimumQuery = new RangeMinimumQuery(numbers);
 
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        for (int i = 0; i < queryCount; i++) {
+            stringTokenizer = new StringTokenizer(bufferedReader.readLine());
 
-        for (int i = 0; i < m; i++) {
-            st = new StringTokenizer(br.readLine());
+            int queryStartIndex = Integer.parseInt(stringTokenizer.nextToken());
+            int queryEndIndex = Integer.parseInt(stringTokenizer.nextToken());
 
-            int start = Integer.parseInt(st.nextToken());
-            int end = Integer.parseInt(st.nextToken());
+            int minResult = rangeMinimumQuery.findMinimumInRange(queryStartIndex, queryEndIndex);
 
-            int result = rmq.queryRange(start, end);
-
-            bw.write(String.valueOf(result));
-            bw.newLine();
+            bufferedWriter.write(String.valueOf(minResult));
+            bufferedWriter.newLine();
         }
 
-        br.close();
-        bw.flush();
-        bw.close();
+        bufferedReader.close();
+        bufferedWriter.flush();
+        bufferedWriter.close();
     }
 
-    private static class Rmq {
-        final int size;
-        final int[] tree;
+    private static class RangeMinimumQuery {
+        final int elementCount;
+        final int[] segmentTree;
 
-        public Rmq(int[] arr) {
-            this.size = arr.length;
+        public RangeMinimumQuery(int[] sourceArray) {
+            this.elementCount = sourceArray.length;
 
-            this.tree = new int[size * 4];
-            if (size > 0) {
-                buildTree(arr, 1, 1, size);
+            this.segmentTree = new int[elementCount * 4];
+            if (elementCount > 0) {
+                buildSegmentTree(sourceArray, 1, 1, elementCount);
             }
         }
 
-        private int buildTree(int[] arr, int node, int startInclusive, int endInclusive) {
-            if (startInclusive == endInclusive) {
-                tree[node] = arr[startInclusive - 1];
-                return tree[node];
+        private int buildSegmentTree(int[] sourceArray, int nodeIndex, int rangeStart, int rangeEnd) {
+            if (rangeStart == rangeEnd) {
+                segmentTree[nodeIndex] = sourceArray[rangeStart - 1];
+                return segmentTree[nodeIndex];
             }
 
-            int mid =  startInclusive + (endInclusive - startInclusive) / 2;
+            int midPoint =  rangeStart + (rangeEnd - rangeStart) / 2;
 
-            int left = buildTree(arr, node * 2, startInclusive, mid);
-            int right = buildTree(arr, node * 2 + 1, mid + 1, endInclusive);
+            int leftChildMin = buildSegmentTree(sourceArray, nodeIndex * 2, rangeStart, midPoint);
+            int rightChildMin = buildSegmentTree(sourceArray, nodeIndex * 2 + 1, midPoint + 1, rangeEnd);
 
-            tree[node] = Math.min(left, right);
-            return tree[node];
+            segmentTree[nodeIndex] = Math.min(leftChildMin, rightChildMin);
+            return segmentTree[nodeIndex];
         }
 
-        public int query(int node, int left, int right, int startInclusive, int endInclusive) {
-            if (endInclusive< left || right < startInclusive) {
+        private int findMinimum(int nodeIndex, int searchRangeStart, int searchRangeEnd, int queryRangeStart, int queryRangeEnd) {
+            if (queryRangeEnd < searchRangeStart || searchRangeEnd < queryRangeStart) {
                 return Integer.MAX_VALUE;
             }
 
-            if (startInclusive <= left && right <= endInclusive) {
-                return tree[node];
+            if (queryRangeStart <= searchRangeStart && searchRangeEnd <= queryRangeEnd) {
+                return segmentTree[nodeIndex];
             }
 
-            int mid =  left + (right - left) / 2;
+            int midPoint =  searchRangeStart + (searchRangeEnd - searchRangeStart) / 2;
 
-            int leftResult =  query(node * 2, left, mid, startInclusive, endInclusive);
-            int rightResult =  query(node * 2 + 1, mid + 1, right, startInclusive, endInclusive);
+            int leftResult =  findMinimum(nodeIndex * 2, searchRangeStart, midPoint, queryRangeStart, queryRangeEnd);
+            int rightResult =  findMinimum(nodeIndex * 2 + 1, midPoint + 1, searchRangeEnd, queryRangeStart, queryRangeEnd);
 
             return Math.min(leftResult, rightResult);
         }
 
-        public int queryRange(int startInclusive, int endInclusive) {
-            return this.query(1, 1, size, startInclusive, endInclusive);
+        public int findMinimumInRange(int queryRangeStart, int queryRangeEnd) {
+            return this.findMinimum(1, 1, elementCount, queryRangeStart, queryRangeEnd);
         }
     }
 }
