@@ -1,56 +1,39 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.stream.IntStream;
+import java.util.StringTokenizer;
 
 public class Main {
-    /*
-    # 문제 이해
-    정사각형(크기 100) 도화지 안에 정사각형(크기 10) 검은 색종이를 놓는다
-    검은 영역의 넓이를 반환해야 한다
 
-    # 접근
-    - 검은 색종이의 수는 100이다 단순 구현으로 풀 수 있다
-        시간 복잡도는 고려하지 않아도 된다(N^3까지 가능)
-    - 색칠된 영역을 계속 칠해주면 될거 같다
+    // 가독성을 위해 상수로 정의
+    private static final int CANVAS_SIZE = 100;
+    private static final int PAPER_SIZE = 10;
 
-    # 구현 스텝(입력, 출력 설명 X)
-    1. 도화지 영역을 생성한다
-    2. 검은 색종이로 도화지를 덮는다
-        검은 색종이만큼 도화지 영역 값을 true처리
-    3. true 처리된 영역의 개수를 구한다
-     */
     public static void main(String[] args) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        int blackPaperCount = Integer.parseInt(reader.readLine());
-        int[][] blackPapers = new int[blackPaperCount][2];
-        for (int i = 0; i < blackPaperCount; i++) {
-            blackPapers[i] = Arrays.stream(reader.readLine().split(" "))
-                    .mapToInt(Integer::parseInt)
-                    .toArray();
-        }
-        reader.close();
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        
+        int n = Integer.parseInt(br.readLine());
+        boolean[][] canvas = new boolean[CANVAS_SIZE][CANVAS_SIZE];
+        int totalArea = 0;
 
-       boolean[][] whitePaper = new boolean[101][101];
-        for (int[] blackPaper : blackPapers) {
-            int startRow = blackPaper[0];
-            int startCol = blackPaper[1];
+        for (int i = 0; i < n; i++) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            int x = Integer.parseInt(st.nextToken()); // 왼쪽 벽과의 거리
+            int y = Integer.parseInt(st.nextToken()); // 아래쪽 벽과의 거리
 
-            for (int r = startRow; r < startRow + 10 ; r++) {
-                for (int c = startCol; c < startCol + 10 ; c++) {
-                    whitePaper[r][c] = true;
+            // 색종이 크기만큼 영역을 순회
+            for (int j = x; j < x + PAPER_SIZE; j++) {
+                for (int k = y; k < y + PAPER_SIZE; k++) {
+                    // 빈 영역(!canvas[j][k])일 때만 카운트하고 마킹
+                    if (!canvas[j][k]) {
+                        canvas[j][k] = true;
+                        totalArea++;
+                    }
                 }
             }
         }
 
-        int coloredSize = 0;
-        for (boolean[] row : whitePaper) {
-            for (boolean colored : row) {
-                if (colored) coloredSize++;
-            }
-        }
-
-        System.out.println(coloredSize);
+        System.out.println(totalArea);
+        br.close();
     }
 }
