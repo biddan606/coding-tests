@@ -1,72 +1,57 @@
 import java.util.*;
 
 class Solution {
-    /*
-    # 문제
-    moves 순서대로 인형을 뽑아, 바구니에 넣는다.
-    바구니의 인형 2개가 중복되면 터트려 사라진다.
-    
-    # 구조
-    각 라인은 Deque, 뒤에 채우고 앞에서부터 뺀다.
-    바구니는 Stack, peek와 새로운 인형이 일치하면 터트린다.
-    */
     public int solution(int[][] board, int[] moves) {
-        int size = board.length;
+        // 각 열의 인형을 Deque로 관리 (위가 first)
+        Deque<Integer>[] columns = buildColumns(board);
         
-        // 라인 생성
-        Deque<Integer>[] lines = new Deque[size];
-        for (int i = 0; i < size; i++) {
-            lines[i] = new ArrayDeque<>();
-        }
-        
-        for (int r = 0; r < size; r++) {
-            for (int c = 0; c < size; c++) {
-                int cell = board[r][c];
-                if (cell == 0) {
-                    continue;
-                }
-                
-                lines[c].addLast(cell);
-            }
-        }
-        
-        // 바구니 생성
+        // 바구니 (위가 first)
         Deque<Integer> basket = new ArrayDeque<>();
         
-        // 게임 진행
-        int score = 0;
+        int explodedCount = 0;
         
         for (int move : moves) {
-            int line = move - 1;
+            int columnIndex = move - 1;
             
-            if (lines[line].isEmpty()) {
+            // 인형 뽑기
+            Integer doll = pickDoll(columns[columnIndex]);
+            if (doll == null) {
                 continue;
             }
             
-            Integer doll = lines[line].removeFirst();
-            
-            basket.addFirst(doll);
-            score += popBasket(basket);
-        }
-        
-        return score;
-    }
-    
-    private int popBasket(Deque<Integer> basket) {
-        int score = 0;
-        boolean processing = true;
-        
-        while (basket.size() >= 2 && processing) {
-            Integer first = basket.removeFirst();
-            if (basket.peekFirst() == first) {
+            // 바구니에 넣고 터트리기 확인
+            if (!basket.isEmpty() && basket.peekFirst().equals(doll)) {
                 basket.removeFirst();
-                score += 2;
+                explodedCount += 2;
             } else {
-                basket.addFirst(first);
-                processing = false;
+                basket.addFirst(doll);
             }
         }
         
-        return score;
+        return explodedCount;
+    }
+    
+    private Deque<Integer>[] buildColumns(int[][] board) {
+        int size = board.length;
+        Deque<Integer>[] columns = new ArrayDeque[size];
+        
+        for (int i = 0; i < size; i++) {
+            columns[i] = new ArrayDeque<>();
+        }
+        
+        // 위에서 아래로 스캔하여 Deque에 추가 (위가 first)
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                if (board[row][col] != 0) {
+                    columns[col].addLast(board[row][col]);
+                }
+            }
+        }
+        
+        return columns;
+    }
+    
+    private Integer pickDoll(Deque<Integer> column) {
+        return column.pollFirst();  // 비어있으면 null 반환
     }
 }
