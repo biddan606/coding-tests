@@ -38,27 +38,23 @@ class Solution {
                 boolean correct = true;
 
                 if (uniqueCheck != 0x1FF) {
-                    System.out.println("유니크하지 않습니다.");
                     correct = false;
                 }
 
                 for (int i = 0; i < rowSums.length; i++) {
                     if (rowSums[i] != 15) {
-                        System.out.println("행 합 불일치");
                         correct = false;
                     }
                 }
 
                 for (int i = 0; i < colSums.length; i++) {
                     if (colSums[i] != 15) {
-                        System.out.println("열 합 불일치");
                         correct = false;
                     }
                 }
 
                 for (int i = 0; i < diagSums.length; i++) {
                     if (diagSums[i] != 15) {
-                        System.out.println("대각 합 불일치");
                         correct = false;
                     }
                 }
