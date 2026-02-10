@@ -45,73 +45,53 @@ import java.util.Arrays;
  */
 public class Main {
 
-    static int rows;
-    static int cols;
-    static boolean[][] visited;
+    private static final int[][] DIRECTIONS = {{-1, 1}, {0, 1}, {1, 1}};
 
-    private static final int[][] DIRECTIONS = {
-            {-1, 1},
-            {0, 1},
-            {1, 1}
-    };
+    private static int rows, cols;
+    private static boolean[][] blocked;
 
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        readInput();
 
-        int[] meta = Arrays.stream(br.readLine().split(" "))
-                .mapToInt(Integer::parseInt)
-                .toArray();
-        rows = meta[0];
-        cols = meta[1];
-
-        char[][] buildings = new char[rows][];
+        int count = 0;
         for (int row = 0; row < rows; row++) {
-            buildings[row] = br.readLine().toCharArray();
-        }
-        br.close();
-
-        visited = new boolean[rows][cols];
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                if (buildings[row][col] == 'x') {
-                    visited[row][col] = true;
-                }
+            if (!blocked[row][0] && connect(row, 0)) {
+                count++;
             }
         }
-
-        int result = 0;
-        for (int row = 0; row < rows; row++) {
-            if (!visited[row][0] && dfs(row, 0)) {
-                result++;
-            }
-        }
-
-        System.out.println(result);
+        System.out.println(count);
     }
 
-    private static boolean dfs(int row, int col) {
-        visited[row][col] = true;
+    private static void readInput() throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        String[] meta = br.readLine().split(" ");
+        rows = Integer.parseInt(meta[0]);
+        cols = Integer.parseInt(meta[1]);
+
+        blocked = new boolean[rows][cols];
+        for (int row = 0; row < rows; row++) {
+            char[] line = br.readLine().toCharArray();
+            for (int col = 0; col < cols; col++) {
+                blocked[row][col] = (line[col] == 'x');
+            }
+        }
+        br.close();
+    }
+
+    private static boolean connect(int row, int col) {
+        blocked[row][col] = true;
 
         if (col == cols - 1) {
             return true;
         }
 
-        for (int[] direction : DIRECTIONS) {
-            int nextRow = row + direction[0];
-            int nextCol = col + direction[1];
-
-            if (nextRow < 0 || nextRow >= rows || nextCol >= cols) {
-                continue;
-            }
-            if (visited[nextRow][nextCol]) {
-                continue;
-            }
-
-            if (dfs(nextRow, nextCol)) {
+        for (int[] dir : DIRECTIONS) {
+            int nr = row + dir[0], nc = col + dir[1];
+            if (nr >= 0 && nr < rows && nc < cols && !blocked[nr][nc] && connect(nr, nc)) {
                 return true;
             }
         }
-
         return false;
     }
 }
