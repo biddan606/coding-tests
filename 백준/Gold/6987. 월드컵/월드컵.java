@@ -5,27 +5,6 @@ import java.util.Arrays;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
-/*
-# 문제
-6개의 팀으로 이루어진 4개의 그룹이 있다.
-1개의 그룹 안에서 6개의 팀은 다른 팀과 1번씩 경기를 진행한다.
-진행 결과에 따라 승/무/패가 결정된다.
-
-각 그룹의 결과가 가능하다면 1, 가능하지 않다면 0을 출력한다.
-- ex) "1 1 0 0"
-
-# 접근1
-그룹 단위로 검사를 진행하면 된다.
-각 팀당 결과가 총 5개인지 확인한다.
-    - 그룹에서 치뤄야 할 경기와 팀이 치뤄야 할 경기는 검증 완료
-
-DFS로 1경기씩 무작위로 결정한다.
-모든 경기 결정을 다 했다면, 모든 팀들의 승/무/패가 0인지 확인한다.
-- 결과는 그룹단위로 이루어지므로, 그룹 단위로 DFS를 진행
-
-# 풀이1
-1.
- */
 public class Main {
     private static final int GROUP_SIZE = 4;
     private static final int TEAM_SIZE = 6;
@@ -57,53 +36,52 @@ public class Main {
     }
 
     private static int validateGroup(int groupIndex) {
-        return validateGroup(groupIndex, 0, 1);
+        // 사전 검증: 각 팀의 승+무+패 == 5, 총 승 == 총 패, 총 무승부 짝수
+        int totalWin = 0, totalDraw = 0, totalLoss = 0;
+        for (int t = 0; t < TEAM_SIZE; t++) {
+            int w = record[groupIndex][t][WIN];
+            int d = record[groupIndex][t][DRAW];
+            int l = record[groupIndex][t][LOSS];
+            if (w + d + l != 5 || w < 0 || d < 0 || l < 0) return 0;
+            totalWin += w;
+            totalDraw += d;
+            totalLoss += l;
+        }
+        if (totalWin != totalLoss || totalDraw % 2 != 0) return 0;
+
+        return dfs(groupIndex, 0, 1);
     }
 
-    private static int validateGroup(int groupIndex, int team1Index, int team2Index) {
-        if (team1Index == TEAM_SIZE - 1) {
-            // 모든 팀들의 승/무/패 0 확인
-            for (int[] team : record[groupIndex]) {
-                for (int j : team) {
-                    if (j != 0) {
-                        return 0;
-                    }
-                }
-            }
+    private static int dfs(int gi, int t1, int t2) {
+        if (t1 == TEAM_SIZE - 1) {
             return 1;
         }
 
-        int nextTeam1Index = team2Index == TEAM_SIZE - 1 ? team1Index + 1 : team1Index;
-        int nextTeam2Index = team2Index == TEAM_SIZE - 1 ? nextTeam1Index + 1 : team2Index + 1;
+        int nt1 = t2 == TEAM_SIZE - 1 ? t1 + 1 : t1;
+        int nt2 = t2 == TEAM_SIZE - 1 ? nt1 + 1 : t2 + 1;
 
         // team1 승, team2 패
-        record[groupIndex][team1Index][WIN]--;
-        record[groupIndex][team2Index][LOSS]--;
-        if (validateGroup(groupIndex, nextTeam1Index, nextTeam2Index) == 1) {
-            return 1;
-        }
-        record[groupIndex][team1Index][WIN]++;
-        record[groupIndex][team2Index][LOSS]++;
-
+        if (tryMatch(gi, t1, t2, WIN, LOSS, nt1, nt2) == 1) return 1;
         // team1 무, team2 무
-        record[groupIndex][team1Index][DRAW]--;
-        record[groupIndex][team2Index][DRAW]--;
-        if (validateGroup(groupIndex, nextTeam1Index, nextTeam2Index) == 1) {
-            return 1;
-        }
-        record[groupIndex][team1Index][DRAW]++;
-        record[groupIndex][team2Index][DRAW]++;
-
+        if (tryMatch(gi, t1, t2, DRAW, DRAW, nt1, nt2) == 1) return 1;
         // team1 패, team2 승
-        record[groupIndex][team1Index][LOSS]--;
-        record[groupIndex][team2Index][WIN]--;
-        if (validateGroup(groupIndex, nextTeam1Index, nextTeam2Index) == 1) {
-            return 1;
-        }
-        record[groupIndex][team1Index][LOSS]++;
-        record[groupIndex][team2Index][WIN]++;
+        if (tryMatch(gi, t1, t2, LOSS, WIN, nt1, nt2) == 1) return 1;
 
         return 0;
+    }
+
+    private static int tryMatch(int gi, int t1, int t2, int t1Type, int t2Type, int nt1, int nt2) {
+        record[gi][t1][t1Type]--;
+        record[gi][t2][t2Type]--;
+
+        int res = 0;
+        if (record[gi][t1][t1Type] >= 0 && record[gi][t2][t2Type] >= 0) {
+            res = dfs(gi, nt1, nt2);
+        }
+
+        record[gi][t1][t1Type]++;
+        record[gi][t2][t2Type]++;
+        return res;
     }
 
     private static void readInput() throws IOException {
