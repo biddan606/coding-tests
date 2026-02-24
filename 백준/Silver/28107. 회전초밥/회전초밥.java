@@ -51,7 +51,7 @@ public class Main {
         }
 
         for (int i = 1; i <= 200000; i++) {
-            preferredCustomerList[i].sort((a, b) -> b - a);
+            Collections.reverse(preferredCustomerList[i]);
         }
 
         st = new StringTokenizer(br.readLine());
