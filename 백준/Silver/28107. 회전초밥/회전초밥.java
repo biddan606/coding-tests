@@ -1,83 +1,71 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.StringTokenizer;
 
 /**
- * @author seonyu BOJ 28107. 회전초밥
- * <p>
- * 1. 입력받기 & 변수 1-1. 손님의 수 customerNum, 초밥의 수 sushiNum 1-2. 각 손님의 주문 목록 1-2-1. 초밥 종류를 인덱스로, List[]
- * preferredCustomerList에도 이 초밥을 선호하는 손님을 저장 * 이때 초밥의 개수가 5개라 해서 꼭 초밥 종류 수가 5이하로 주어지지 않는다. 1-3. 제공되는 초밥의 순서 sushiOrder[]
- * 1-4. 각 손님이 먹을 수 있는 초밥의 개수 sushiCount[]
- * <p>
- * <p>
- * 2. 제공되는 초밥의 순서를 순회하며, 2-1. 현재 초밥을 선호하는 손님이 있는지 체크 2-1-1. 있다면 가장 빠른 손님에게 초밥을 제공 2-1-2. 그 손님 번호를 preferredCustomer에서 제거
- * 2-1-3. 그 손님이 먹을 수 있는 초밥 개수 +1 2-2. 없다면 이 초밥은 pass
+ * BOJ - 28107번: 회전초밥 (실버1) 
+ * 
+ * @author suinLee
+ * 
+ * [문제]
+ * - N명의 손님과 M개의 초밥
+ * - 초밥을 먼저 받은 손님이 먹으면, 뒤에 사람은 못먹는다.
+ * - 만약 아무도 먹지 않으면 버려진다.
+ * - N명의 손님은 각자 목고 싶은 초밥 주문 목록을 가지고 있고, 
+ * - (1번부터 N번 손님의 순서대로, 각 종류의 초밥은 최대 한 번만) 
+ * - M개의 초밥이 순서대로 주어진다. 
+ * - 각 손님이 먹게 되는 초밥의 개수를 구하자.
+ * 
+ * [전략]
+ * - N명의 주문 목록에 대한 인접 리스트 생성 -> 인덱스: 초밥 번호, 값: 손님 번호
+ * - M개의 음식을 덱으로 받기
+ * - poll할때마다 인접 리스트에 있는 손님 번호 중 가장 작은 번호 빼기
+ * - answer에 손님 번호에 해당하는 값에 ++하기 
+ * 
  */
+
 public class Main {
+	
+	public static void main(String[] args) throws IOException{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringBuilder sb = new StringBuilder();
+		
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		int N = Integer.parseInt(st.nextToken()); // 손님 수
+		int M = Integer.parseInt(st.nextToken()); // 초밥의 수 
+		
+		Deque <Integer>[] orderLst = new ArrayDeque[200001]; // 초밥의 종류
+		for (int i = 1; i < 200001; i++) {
+			orderLst[i] = new ArrayDeque<>();
+		}
+		
+		for (int order = 1; order <= N; order++) { // 1번부터 N번 손님까지의 주문 
+			st = new StringTokenizer(br.readLine());
+			int number = Integer.parseInt(st.nextToken());
+			for (int num = 0; num < number; num++) {
+				orderLst[Integer.parseInt(st.nextToken())].offer(order); // 메뉴 인덱스에 손님 번호 넣기 
+			}
+		}
+		
+		int [] answer = new int[N];
+		
+		st = new StringTokenizer(br.readLine());
+		for (int m = 0; m < M; m++) { // M개의 메뉴가 공백으로 구분되어 순서대로 
+			int menu = Integer.parseInt(st.nextToken());
+			if (!orderLst[menu].isEmpty()) { // 해당 메뉴를 주문한 사람이 있는 경우
+				int guest = orderLst[menu].poll(); // 가장 먼저 주문한 사람으로 poll 
+				answer[guest-1]++; // 그 손님 주문 수 증 가 
+			}
+		}
 
-    static int customerNum;
-    static int sushiNum;
-    static List<Integer>[] preferredCustomerList;
-    static int[] sushiOrder;
-    static int[] sushiCount;
+		for (int ans : answer) {
+			sb.append(ans).append(" ");
+		}
+		
+		System.out.println(sb);
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-
-        customerNum = Integer.parseInt(st.nextToken());
-        sushiNum = Integer.parseInt(st.nextToken());
-
-        preferredCustomerList = new List[200001];
-        for (int i = 0; i <= 200000; i++) {
-            preferredCustomerList[i] = new ArrayList<>();
-        }
-
-        sushiOrder = new int[sushiNum];
-        sushiCount = new int[customerNum + 1];
-
-        for (int customer = 1; customer <= customerNum; customer++) {
-            st = new StringTokenizer(br.readLine());
-
-            int wantedSushiNum = Integer.parseInt(st.nextToken());
-            for (int w = 0; w < wantedSushiNum; w++) {
-                int sushiType = Integer.parseInt(st.nextToken());
-                preferredCustomerList[sushiType].add(customer);
-            }
-        }
-
-        for (int i = 1; i <= 200000; i++) {
-            Collections.reverse(preferredCustomerList[i]);
-        }
-
-        st = new StringTokenizer(br.readLine());
-        for (int order = 0; order < sushiNum; order++) {
-            sushiOrder[order] = Integer.parseInt(st.nextToken());
-        }
-
-        // 2. 제공되는 초밥의 순서를 순회하며,
-        for (int currOrder : sushiOrder) {
-            // 2-1. 현재 초밥을 선호하는 손님이 있는지 체크
-            if (!preferredCustomerList[currOrder].isEmpty()) {
-                // 2-1-1. 있다면 가장 빠른 손님에게 초밥을 제공
-                int customer = preferredCustomerList[currOrder].get(preferredCustomerList[currOrder].size() - 1);
-
-                // 2-1-2. 그 손님 번호를 preferredCustomer에서 제거
-                preferredCustomerList[currOrder].remove(preferredCustomerList[currOrder].size() - 1);
-
-                // 2-1-3. 그 손님이 먹을 수 있는 초밥 개수 +1
-                sushiCount[customer]++;
-            }
-            // 2-2. 없다면 이 초밥은 pass
-        }
-
-        for (int i = 1; i <= customerNum; i++) {
-            System.out.print(sushiCount[i] + " ");
-        }
-    }
-
+	}
 }
