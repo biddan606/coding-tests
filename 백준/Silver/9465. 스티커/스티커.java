@@ -1,55 +1,50 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+import java.io.*;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        StringBuilder sb = new StringBuilder();
+        StreamTokenizer in = new StreamTokenizer(new BufferedReader(new InputStreamReader(System.in)));
+        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(System.out));
 
-        int T = Integer.parseInt(reader.readLine());
+        in.nextToken();
+        int T = (int) in.nval;
+
         while (T-- > 0) {
-            int colSize = Integer.parseInt(reader.readLine());
-            int[][] values = new int[2][colSize];
+            in.nextToken();
+            int n = (int) in.nval;
 
-            for (int row = 0; row < 2; row++) {
-                StringTokenizer st = new StringTokenizer(reader.readLine());
-                for (int col = 0; col < colSize; col++) {
-                    values[row][col] = Integer.parseInt(st.nextToken());
+            int[] v0 = new int[n], v1 = new int[n];
+            for (int i = 0; i < n; i++) { in.nextToken(); v0[i] = (int) in.nval; }
+            for (int i = 0; i < n; i++) { in.nextToken(); v1[i] = (int) in.nval; }
+
+            int[] d0 = new int[n], d1 = new int[n];
+
+            // col 0
+            d0[0] = v0[0];
+            d1[0] = v1[0];
+
+            if (n >= 2) {
+                // col 1
+                d0[1] = d1[0] + v0[1];
+                d1[1] = d0[0] + v1[1];
+
+                // col 2 ~
+                for (int c = 2; c < n; c++) {
+                    d0[c] = Math.max(Math.max(d0[c - 2], d1[c - 2]), d1[c - 1]) + v0[c];
+                    d1[c] = Math.max(Math.max(d0[c - 2], d1[c - 2]), d0[c - 1]) + v1[c];
                 }
             }
 
-            int[][] dp = new int[2][colSize];
-
-            for (int col = 0; col < colSize; col++) {
-                for (int row = 0; row < 2; row++) {
-                    int other = 1 - row;
-                    int best = 0;
-
-                    if (col >= 2) {
-                        best = Math.max(dp[row][col - 2], dp[other][col - 2]);
-                    }
-                    if (col >= 1) {
-                        best = Math.max(best, dp[other][col - 1]);
-                    }
-
-                    dp[row][col] = best + values[row][col];
-                }
+            int ans = Math.max(d0[n - 1], d1[n - 1]);
+            if (n >= 2) {
+                ans = Math.max(ans, Math.max(d0[n - 2], d1[n - 2]));
             }
 
-            int answer = 0;
-            for (int row = 0; row < 2; row++) {
-                for (int col = Math.max(0, colSize - 2); col < colSize; col++) {
-                    answer = Math.max(answer, dp[row][col]);
-                }
-            }
-
-            sb.append(answer).append("\n");
+            out.write(Integer.toString(ans));
+            out.newLine();
         }
 
-        reader.close();
-        System.out.println(sb);
+        out.flush();
+        out.close();
     }
 }
