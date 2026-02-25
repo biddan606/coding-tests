@@ -3,49 +3,40 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
-
 public class Main {
 
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
         int T = Integer.parseInt(reader.readLine());
-        for (int i = 0; i < T; i++) {
+        while (T-- > 0) {
             int colSize = Integer.parseInt(reader.readLine());
             int[][] values = new int[2][colSize];
 
             for (int row = 0; row < 2; row++) {
-                StringTokenizer colTokenizer = new StringTokenizer(reader.readLine());
+                StringTokenizer st = new StringTokenizer(reader.readLine());
                 for (int col = 0; col < colSize; col++) {
-                    values[row][col] = Integer.parseInt(colTokenizer.nextToken());
+                    values[row][col] = Integer.parseInt(st.nextToken());
                 }
             }
 
             int[][] dp = new int[2][colSize];
 
             for (int col = 0; col < colSize; col++) {
-                // row=0
-                if (col >= 2) {
-                    dp[0][col] = dp[0][col - 2];
-                    dp[0][col] = Math.max(dp[0][col], dp[1][col - 2]);
-                }
-                if (col >= 1) {
-                    dp[0][col] = Math.max(dp[0][col], dp[1][col - 1]);
-                }
+                for (int row = 0; row < 2; row++) {
+                    int other = 1 - row;
+                    int best = 0;
 
-                dp[0][col] += values[0][col];
+                    if (col >= 2) {
+                        best = Math.max(dp[row][col - 2], dp[other][col - 2]);
+                    }
+                    if (col >= 1) {
+                        best = Math.max(best, dp[other][col - 1]);
+                    }
 
-                // row=1
-                if (col >= 2) {
-                    dp[1][col] = dp[0][col - 2];
-                    dp[1][col] = Math.max(dp[1][col], dp[1][col - 2]);
+                    dp[row][col] = best + values[row][col];
                 }
-                if (col >= 1) {
-                    dp[1][col] = Math.max(dp[1][col], dp[0][col - 1]);
-                }
-
-                dp[1][col] += values[1][col];
             }
 
             int answer = 0;
@@ -55,10 +46,10 @@ public class Main {
                 }
             }
 
-            stringBuilder.append(answer).append("\n");
+            sb.append(answer).append("\n");
         }
 
         reader.close();
-        System.out.println(stringBuilder);
+        System.out.println(sb);
     }
 }
